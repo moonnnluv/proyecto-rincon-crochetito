@@ -34,6 +34,97 @@
                 </div>
             </div>
         </nav>
+ <!-- CARRUSEL -->
+        <div id="demo" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators"> <!-- botones indicadores del carrusel -->
+                <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+                <button type="button" data-bs-target="#demo" data-bs-slide-to="3"></button>
+            </div>
+
+  
+            <div class="carousel-inner"> <!-- contenedor de los items del carrusel -->
+                <div class="carousel-item active"> <!-- item activo -->
+                    <img src="img/header_logo.png" alt="" class="d-block w-100">
+                    <div class="carousel-caption">
+                        <p>producto en promoción</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="img/header_logo.png" alt="" class="d-block w-100">
+                    <div class="carousel-caption">
+                        <p>Producto en promoción</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="img/header_imagenes.png" alt="" class="d-block w-100">
+                    <div class="carousel-caption">
+                        <p>Producto en promoción</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="img/header_imagenes.png" alt="" class="d-block w-100">
+                    <div class="carousel-caption">
+                        <p>Producto en promoción</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- controles de navegación del carrusel -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev"> <!-- botón anterior -->
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next"> <!-- botón siguiente -->
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div> <!-- CARRUSEL -->
+
+        <!-- CARDS -->
+        <div class="row"> <!-- fila de la cuadrícula -->    
+            <div class="col-md-4"> <!-- columna que ocupa 4/12 partes en pantallas medianas y grandes -->
+                <div class="card" style="width:400px">
+                    <img class="card-img-top" src="img/no_producto.png" alt="Card image"> <!-- imagen de la tarjeta -->
+                    <div class="card-body"> <!-- cuerpo de la tarjeta -->
+                        <h4 class="card-title">John Doe</h4>
+                        <p class="card-text">Some example text.</p>
+                        <a href="#" class="btn btn-primary">See Profile</a>
+                    </div>
+                </div>
+            </div><!--col-->
+            <div class="col-md-4">
+                <div class="card" style="width:400px">
+                    <img class="card-img-top" src="img/no_producto.png" alt="Card image">
+                    <div class="card-body">
+                        <h4 class="card-title">John Doe</h4>
+                        <p class="card-text">Some example text.</p>
+                        <a href="#" class="btn btn-primary">See Profile</a>
+                    </div>  
+                </div>
+            </div><!--col-->
+
+            <div class="col-md-4">
+                <div class="card" style="width:400px">
+                    <img class="card-img-top" src="img/no_producto.png" alt="Card image">
+                    <div class="card-body">
+                        <h4 class="card-title">John Doe</h4>
+                        <p class="card-text">Some example text.</p>
+                        <a href="#" class="btn btn-primary">See Profile</a>
+                    </div>
+                </div>
+            </div><!--col-->
+
+        </div><!--row-->
     
+    </div><!--container-->
+    </div>
+
+
+
+
+            <footer class="bg-dark text-light text-center py-3 mt-4">
+            <p>&copy; 2025 Rincón Crochetito</p>
+                <!-- agregar un 'hecho con <3 por ale y linkear github'-->
+            </footer>
 </body>
 </html>
