@@ -1,0 +1,56 @@
+:root {
+  --color-marca: #9b5de5;   /* morado */
+  --color-marca-hover: #7b3fc1;
+}
+
+/* Botones con color de marca */
+.btn-marca {
+  background-color: var(--color-marca);
+  color: #fff;
+  border: none;
+}
+.btn-marca:hover {
+  background-color: var(--color-marca-hover);
+  color: #fff;
+}
+
+/* Links de marca */
+a.marca-link {
+  color: var(--color-marca);
+  font-weight: 600;
+}
+a.marca-link:hover {
+  color: var(--color-marca-hover);
+}
+
+/* Banner de marca */
+.alert-marca {
+  background-color: var(--color-marca);
+  color: #fff;
+  border: none;
+}
+.alert-marca a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.alert-marca a:hover {
+  text-decoration: none;
+  color: #ffd700; /* dorado */
+}
+
+/* barra arriba de encargos*/
+.alert-marca {
+  background-color: #aa6fea; 
+  color: #fff;              
+  border: none;
+}
+
+.alert-marca a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.alert-marca a:hover {
+  text-decoration: none;
+}
