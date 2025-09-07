@@ -44,10 +44,28 @@
                         <li>
                             <a class="nav-link" href="contacto.html">Contacto</a>
                         </li>
-                    </ul>
+                       <!-- NO hay sesión → link a iniciar-sesion.html -->
+                        <li class="nav-item" id="navIngresarItem">
+                        <a class="btn btn-primary btn-sm" href="iniciar_sesion.html">Ingresar</a>
+                        </li>
+
+                        <!-- SÍ hay sesión → dropdown -->
+                        <li class="nav-item dropdown d-none" id="navUserItem">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> <span id="navUserEmail">Usuario</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="mi-cuenta.html">Mi cuenta</a></li>
+                            <li><a class="dropdown-item" href="pedidos.html">Mis pedidos</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item" id="btnLogout">Cerrar sesión</button></li>
+                        </ul>
+                    </li>
+                </ul>
                 </div>
             </div>
-        </nav>
+            </nav>
+
  <!-- CARRUSEL -->
         <div id="demo" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators"> <!-- botones indicadores del carrusel -->
