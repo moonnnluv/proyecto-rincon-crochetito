@@ -13,43 +13,48 @@
 <body>
     <!-- Topbar -->
     <div class="alert alert-marca text-center rounded-0 mb-0 py-2">
-        ¿Encargos abiertos? 
-        <a href="https://www.instagram.com/rincon.crochetito" target="_blank">
-            ¡Sí! Escríbeme para tu pedido personalizado ✨
-        </a>
+    ¿Encargos abiertos?
+    <a href="https://www.instagram.com/rincon.crochetito" target="_blank">
+        ¡Sí! Escríbeme para tu pedido personalizado ✨
+    </a>
     </div>
 
-    <!-- contenedor principal -->
-    <div class="container">
-        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">  <!-- barra de menú principal -->
-            <div class="container-fluid">
-                <!-- botón para colapsar el menú en pantallas pequeñas (hamburguesa)-->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-                    <span class="navbar-toggler-icon"></span> 
-                </button> 
-                <!-- contenido del menú colapsable -->
-                <div class="collapse navbar-collapse" id="collapsibleNavbar">
-                    <ul class="navbar-nav ms-auto"> <!-- ms-auto = alinea los links a la derecha -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="home.html">Home</a> <!-- enlace del menú -->
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="productos.html">Productos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="nosotros.html">Nosotros</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="blog.html">Blogs</a>
-                        </li>
-                        <li>
-                            <a class="nav-link" href="contacto.html">Contacto</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+    <!-- NAVBAR FULL-WIDTH (fuera del .container) -->
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top w-100">
+    <div class="container"> <!-- si prefieres que el contenido vaya centrado -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+        </button>
 
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="home.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="productos.html">Productos</a></li>
+            <li class="nav-item"><a class="nav-link" href="nosotros.html">Nosotros</a></li>
+            <li class="nav-item"><a class="nav-link" href="blog.html">Blogs</a></li>
+            <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
+
+            <!-- NO hay sesión -->
+            <li class="nav-item" id="navIngresarItem">
+                <a class="btn btn-primary btn-sm" href="iniciar_sesion.html">Ingresar</a>
+            </li>
+
+            <!-- SÍ hay sesión -->
+            <li class="nav-item dropdown d-none" id="navUserItem">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle"></i> <span id="navUserEmail">Usuario</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="mi-cuenta.html">Mi cuenta</a></li>
+                <li><a class="dropdown-item" href="pedidos.html">Mis pedidos</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><button class="dropdown-item" id="btnLogout">Cerrar sesión</button></li>
+            </ul>
+            </li>
+        </ul>
+        </div>
+    </div>
+</nav>
     <section class="about">
   <div class="about__container">
     <figure class="about__figure">
@@ -67,7 +72,7 @@
       <p>Producción a pequeña escala, acabados prolijos y atención a los detalles.</p>
 
       <h3>Misión</h3>
-      <p>Crear tejidos funcionales y bellos que celebren lo artesanal, promoviendo el consumo consciente.</p>
+      <p>Crear tejidos funcionales y bellos que celebren lo artesanal, promoviendo el consumo consciente.</p> 
 
       <h3>Visión</h3>
       <p>Ser un referente local en crochet responsable, con diseños atemporales y una comunidad cercana.</p>

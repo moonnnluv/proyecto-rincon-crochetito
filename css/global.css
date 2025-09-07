@@ -54,3 +54,9 @@ a.marca-link:hover {
 .alert-marca a:hover {
   text-decoration: none;
 }
+
+.card-img-top {
+  aspect-ratio: 16 / 10;  /* o 4/3, prueba el que te guste */
+  object-fit: cover;
+}
+
