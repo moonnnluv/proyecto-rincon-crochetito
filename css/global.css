@@ -59,4 +59,59 @@ a.marca-link:hover {
   aspect-ratio: 16 / 10;  /* o 4/3, prueba el que te guste */
   object-fit: cover;
 }
+/* Que la barra morada no tape al navbar en sticky */
+.alert-marca { z-index: 1031; }          /* > navbar (1030) */
+.navbar.sticky-top { z-index: 1030; }
+
+/* Limpieza general del navbar */
+.navbar .nav-link {
+  padding: .5rem .75rem;
+  color: rgba(255,255,255,.85);
+}
+.navbar .nav-link:hover,
+.navbar .nav-link:focus,
+.navbar .nav-link.active {
+  color: #fff;
+}
+
+/* Ajuste del badge del carrito */
+.navbar .badge {
+  box-shadow: 0 0 0 2px rgba(0,0,0,.45);  /* borde para que se lea sobre fondo oscuro */
+}
+
+/* Espacios consistentes a ambos lados (menos apretado) */
+.navbar .navbar-nav { gap: .25rem; }
+
+/* El brand no se achique */
+.navbar-brand { font-weight: 600; }
+
+.navbar-nav .nav-link {
+  padding: .5rem 1rem;
+  font-weight: 500;
+}
+
+/* Centrar realmente el menú en desktop */
+@media (min-width: 768px) {
+  .navbar .container { position: relative; } /* por si acaso */
+  .navbar .navbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+  }
+}
+
+/* En mobile, que el menú colapsado sea normal */
+@media (max-width: 767.98px) {
+  .navbar .navbar-center {
+    position: static;
+    transform: none;
+  }
+}
+
+/* Pulido visual opcional */
+.navbar .nav-link { padding: .5rem .75rem; color: rgba(255,255,255,.85); }
+.navbar .nav-link:hover, .navbar .nav-link.active { color: #fff; }
+.alert-marca { z-index: 1031; }
+.navbar.sticky-top { z-index: 1030; }
 
