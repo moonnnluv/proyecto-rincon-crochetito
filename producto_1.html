@@ -16,50 +16,55 @@
     <link rel="stylesheet" href="css/global.css">
     </head>
     <body>
-    <!-- Topbar -->
-    <div class="alert alert-marca text-center rounded-0 mb-0 py-2">
-        ¿Encargos abiertos?
-        <a href="https://www.instagram.com/rincon.crochetito" target="_blank">
-        ¡Sí! Escríbeme para tu pedido personalizado ✨
-        </a>
+  <!-- Topbar -->
+  <div class="alert alert-marca text-center rounded-0 mb-0 py-2">
+    ¿Encargos abiertos?
+    <a href="https://www.instagram.com/rincon.crochetito" target="_blank">
+      ¡Sí! Escríbeme para tu pedido personalizado ✨
+    </a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top shadow-sm">
+    <div class="container align-items-center">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
+        <img src="img/logo.ico" alt="Rincón Crochetito" width="28" height="28" class="rounded">
+        <span>Rincón Crochetito</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+        <ul class="navbar-nav gap-2 navbar-center">
+          <li class="nav-item"><a class="nav-link" href="home.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="productos.html">Productos</a></li>
+          <li class="nav-item"><a class="nav-link" href="nosotros.html">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link" href="blog.html">Blogs</a></li>
+          <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
+        </ul>
+
+        <ul class="navbar-nav align-items-center gap-2 ms-auto">
+          <li class="nav-item">
+            <a class="nav-link p-0" href="carrito.html" aria-label="Carrito">
+              <span class="position-relative d-inline-block px-2 py-1">
+                <i class="bi bi-cart3 fs-5"></i>
+                <span id="cartCount" class="position-absolute translate-middle badge rounded-pill bg-danger d-none"
+                      style="top:-4px; left:18px; min-width:18px; height:18px; line-height:18px; font-size:.7rem; padding:0;">
+                  0
+                </span>
+              </span>
+            </a>
+          </li>
+          <li class="nav-item" id="navIngresarItem">
+            <a class="btn btn-primary btn-sm" href="iniciar_sesion.html">Ingresar</a>
+          </li>
+        </ul>
+      </div>
     </div>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top w-100">
-        <div class="container">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-            <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="home.html">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="productos.html">Productos</a></li>
-            <li class="nav-item"><a class="nav-link" href="nosotros.html">Nosotros</a></li>
-            <li class="nav-item"><a class="nav-link" href="blog.html">Blogs</a></li>
-            <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
-
-            <!-- NO hay sesión -->
-            <li class="nav-item" id="navIngresarItem">
-                <a class="btn btn-primary btn-sm" href="iniciar_sesion.html">Ingresar</a>
-            </li>
-
-            <!-- SÍ hay sesión -->
-            <li class="nav-item dropdown d-none" id="navUserItem">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                <i class="bi bi-person-circle"></i> <span id="navUserEmail">Usuario</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="mi-cuenta.html">Mi cuenta</a></li>
-                <li><a class="dropdown-item" href="pedidos.html">Mis pedidos</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><button class="dropdown-item" id="btnLogout">Cerrar sesión</button></li>
-                </ul>
-            </li>
-            </ul>
-        </div>
-        </div>
-    </nav>
+  </nav>
 
     <!-- Contenido -->
     <main class="container py-4">
