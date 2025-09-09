@@ -51,50 +51,36 @@
             <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
         </ul>
 
-        <!-- Acciones a la derecha -->
-        <ul class="navbar-nav align-items-center gap-2 ms-auto">
-        <!-- Carrito -->
-        <li class="nav-item">
-            <a class="nav-link p-0" href="carrito.html" aria-label="Carrito">
-            <span class="position-relative d-inline-block px-2 py-1">
-                <i class="bi bi-cart3 fs-5"></i>
-                <span id="cartCount"
-                class="position-absolute translate-middle badge rounded-pill bg-danger d-none"
-                style="top:-4px; left:18px; min-width:18px; height:18px; line-height:18px; font-size:.7rem; padding:0;">
-                0
-                </span>
-            </span>
-            </a>
-        </li>
+            <!-- Acciones a la derecha (mock) -->
+            <ul class="navbar-nav align-items-center gap-2 ms-auto">
+                <!-- Carrito -->
+                <li class="nav-item">
+                    <a class="nav-link p-0" href="carrito.html" aria-label="Carrito">
+                    <span class="position-relative d-inline-block px-2 py-1">
+                        <i class="bi bi-cart3 fs-5"></i>
+                        <span id="cartCount"
+                            class="position-absolute translate-middle badge rounded-pill bg-danger d-none"
+                            style="top:-4px; left:18px; min-width:18px; height:18px; line-height:18px; font-size:.7rem; padding:0;">0</span>
+                    </span>
+                    </a>
+                </li>
 
-        <!-- Ingresar (si NO hay sesión) -->
-        <li class="nav-item dropdown d-block" id="navIngresarItem">
-            <a class="btn btn-primary btn-sm dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-            Ingresar
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="iniciar_sesion.html">Iniciar sesión</a></li>
-            <li><a class="dropdown-item" href="home_admin.html" onclick="go('ADMIN')">Vista Admin (demo)</a></li>
-            <li><a class="dropdown-item" href="home_cliente.html" onclick="go('CLIENTE')">Vista Cliente (demo)</a></li>
+                <!-- Usuario siempre visible (mock) -->
+                <li class="nav-item dropdown" id="navUserItem">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle"></i> <span id="navUserEmail">cliente@demo.local</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="mi-cuenta.html">Mi cuenta</a></li>
+                    <li><a class="dropdown-item" href="pedidos.html">Mis pedidos</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <!-- “Cerrar sesión” solo navega (no borra nada porque es mock) -->
+                    <li><a class="dropdown-item" href="home.html">Cerrar “sesión”</a></li>
+                    </ul>
+                </li>
             </ul>
-        </li>
-
-        <!-- Usuario (si HAY sesión) -->
-        <li class="nav-item dropdown d-none" id="navUserItem">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-            <i class="bi bi-person-circle"></i> <span id="navUserEmail">Usuario</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="mi-cuenta.html">Mi cuenta</a></li>
-            <li><a class="dropdown-item" href="pedidos.html">Mis pedidos</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><button class="dropdown-item" id="btnLogout" type="button">Cerrar sesión</button></li>
-            </ul>
-        </li>
-        </ul>
-        </div>
     </div>
-</nav>
+    </nav>
     <!-- CARRUSEL FULL-WIDTH -->
     <div class="container-fluid px-0">
     <div id="demo" class="carousel slide" data-bs-ride="carousel">
@@ -155,38 +141,3 @@
     </footer>
     </body>
     </html>
-
-
-
-<!-- en contacto poner text area
-     validar todo con js
-     pagina 14 dice que debe estar en un arreglo de productos, el carrito de compra, localstorage
-     arreglo = array o json
-     agregar carrito = localstorage (temporal en el navegador que yo esté utilizando en ese momento)
-     imagenes static moverlas a arreglo
-
-     admin solo crear producto, modificar, mostrar
-     TODO VALIDADO
-     usuario poder registrarse (pa dar un 10% de descuento jeje)
-
-     registro solo validado, no se guarda
-     solo 6 pestañas, porque entrega 2 es pesao
-
-     node json server
-
-     npm i -g json-server
-     json-server productos.json // para empezar el server
-
-     mientras el server está en ejecucion, podemos conectar con html y debemos pasar por js para implementar ese metodo
-     fetch (revisarlo en productos.js)
-
-     PONER 6 PRODUCTOS
-     - llavero honguito
-     - cintillo malla
-     - posavasos rosas
-     - macetero rosas
-     - mitones
-     - gorro
-     - 
-     
-     -->

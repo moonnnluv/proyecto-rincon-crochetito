@@ -86,3 +86,26 @@ if (form && emailInput && passInput) {
     window.location.href = 'home.html';
     });
 }
+
+// ===== Atajos de demo: Vista Admin / Vista Cliente =====
+(function(){
+    const LS_AUTH = "nxv3_auth";
+
+    function go(role){
+        // Limpia sesión previa
+        localStorage.removeItem(LS_AUTH);
+
+        // Crea sesión “de mentira”
+        const demoUser = (role === "ADMIN")
+        ? { correo: "admin@demo.local", nombre: "Admin Demo", run: "11.111.111-1", rol: "ADMIN", ts: Date.now() }
+        : { correo: "cliente@demo.local", nombre: "Cliente Demo", run: "22.222.222-2", rol: "CLIENTE", ts: Date.now() };
+
+        localStorage.setItem(LS_AUTH, JSON.stringify(demoUser));
+
+        // Redirige a su home
+        window.location.href = (role === "ADMIN") ? "home_admin.html" : "home_cliente.html";
+    }
+
+    document.getElementById("btnVistaAdmin")?.addEventListener("click", () => go("ADMIN"));
+    document.getElementById("btnVistaCliente")?.addEventListener("click", () => go("CLIENTE"));
+})();
