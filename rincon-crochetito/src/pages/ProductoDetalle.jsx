@@ -16,6 +16,7 @@ export default function ProductoDetalle() {
 
     if (err) return <div className="container py-4">{err}</div>;
     if (!p) return <div className="container py-4">Cargando…</div>;
+    
 
     return (
         <section className="container py-4">
