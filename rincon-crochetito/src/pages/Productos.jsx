@@ -1,35 +1,32 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard.jsx";
+import { getProductos } from "../services/productService.js";
 
-function normalize(p) {
-    return {
-        id: p.id ?? p.codigo ?? p.ID,
-        name: p.name ?? p.nombre ?? "Sin nombre",
-        price: p.price ?? p.precio ?? 0,
-        image: p.image ?? p.imagen ?? "/img/no_producto.png",
-        description: p.description ?? p.descripcion ?? "",
-        featured: p.featured ?? p.destacado ?? false,
-    };
-    }
-
-    export default function Productos() {
+export default function Productos() {
     const [data, setData] = useState([]);
     const [q, setQ] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [err, setErr] = useState("");
 
     useEffect(() => {
-        fetch("/json/productos.json")
-        .then(r => r.json())
-        .then(arr => setData(arr.map(normalize)))
-        .catch(() => setData([]));
+        (async () => {
+        try {
+            const arr = await getProductos();
+            setData(arr);
+        } catch (e) {
+            setErr("No se pudo conectar al backend.");
+        } finally {
+            setLoading(false);
+        }
+        })();
     }, []);
 
-    const filtered = data.filter(p =>
-        p.name.toLowerCase().includes(q.toLowerCase())
-    );
+    const filtered = data.filter(p => (p.name || "").toLowerCase().includes(q.toLowerCase()));
 
     return (
         <section className="container py-4">
         <h2 className="mb-3">Productos</h2>
+        {err && <div className="alert alert-warning">{err}</div>}
         <input
             className="form-control mb-4"
             placeholder="Buscar…"
@@ -37,10 +34,12 @@ function normalize(p) {
             onChange={e => setQ(e.target.value)}
             style={{ maxWidth: 420 }}
         />
-        <div className="row g-4">
+        {loading ? <p>Cargando…</p> : (
+            <div className="row g-4">
             {filtered.map(p => <ProductCard key={p.id} p={p} />)}
-            {filtered.length === 0 && <p>No hay resultados.</p>}
-        </div>
+            {!err && filtered.length === 0 && <p>No hay resultados.</p>}
+            </div>
+        )}
         </section>
     );
 }
