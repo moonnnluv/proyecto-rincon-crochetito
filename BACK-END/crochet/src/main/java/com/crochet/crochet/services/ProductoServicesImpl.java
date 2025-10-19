@@ -47,4 +47,11 @@ public class ProductoServicesImpl implements ProductoServices {
         return productoRepositories.save(existente);
     }
 
+    @Override
+    public Producto desactivar(Long id) {
+        Producto producto = obtenerId(id);
+        producto.setActivo(false);
+        return productoRepositories.save(producto);
+    }
+
 }

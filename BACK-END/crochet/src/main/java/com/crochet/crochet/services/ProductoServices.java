@@ -10,5 +10,6 @@ public interface ProductoServices {
     List<Producto> obtenerTodos();
     void eliminar(Long id);
     Producto actualizar(Long id, Producto productoActualizado);
+    Producto desactivar(Long id);
 
 }

@@ -2,6 +2,8 @@ package com.crochet.crochet.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,12 +26,8 @@ public class Categoria {
     private String nombre;
     
     @OneToMany(mappedBy = "categoria")
+    @JsonIgnore
     private List<Producto> productos;
 
-    @Override
-    public String toString() {
-        return "Categoria [id=" + id + ", nombre=" + nombre + ", productos=" + productos + "]";
-    }
-    
 
 }
