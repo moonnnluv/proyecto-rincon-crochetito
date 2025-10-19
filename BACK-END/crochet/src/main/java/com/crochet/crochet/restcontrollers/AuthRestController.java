@@ -2,9 +2,14 @@ package com.crochet.crochet.restcontrollers;
 
 import com.crochet.crochet.entities.User;
 import com.crochet.crochet.repository.UserRepository;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Autenticación", description = "Operaciones relacionadas con la autenticación de usuarios")
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin
@@ -18,6 +23,7 @@ public class AuthRestController {
   public record LoginRequest(String email, String password) {}
   public record LoginResponse(String message, User user) {}
 
+  @Operation(summary = "Iniciar sesión")
   @PostMapping("/login")
   public LoginResponse login(@RequestBody LoginRequest req){
     String email = req.email().trim().toLowerCase();

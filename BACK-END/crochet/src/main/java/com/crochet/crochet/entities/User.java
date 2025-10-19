@@ -50,8 +50,10 @@ public class User {
     @Column(nullable = false, length = 20)
     private EstadoUsuario estado = EstadoUsuario.ACTIVO; // estado: ACTIVO, INACTIVO
 
-    @Column(name = "creado_en", nullable = false, updatable = false)
-    private LocalDateTime creadoEn;  // fecha de creación (sistema)
+    @org.hibernate.annotations.CreationTimestamp
+    @Column(name="creado_en", nullable=false, updatable=false)
+    private LocalDateTime creadoEn;
+
 
     @PrePersist
     void prePersist() {

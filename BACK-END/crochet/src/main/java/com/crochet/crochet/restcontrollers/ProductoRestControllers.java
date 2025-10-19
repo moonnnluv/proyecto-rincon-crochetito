@@ -19,10 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.crochet.crochet.entities.Producto;
 import com.crochet.crochet.services.ProductoServices;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
 
 @CrossOrigin(origins = "http://localhost:5173")
 
-
+@Tag(name = "Producto", description = "Operaciones relacionadas con los productos de crochet")
 @RestController
 @RequestMapping("/api/productos")
 public class ProductoRestControllers {
@@ -31,12 +34,14 @@ public class ProductoRestControllers {
     @Autowired
     private ProductoServices productoServices;
 
+    @Operation(summary = "Crear un nuevo producto")
     @PostMapping
     public ResponseEntity<Producto> crearProducto(@RequestBody Producto producto) {
         Producto nuevoProducto = productoServices.crear(producto);
         return ResponseEntity.ok(nuevoProducto);
     }
 
+    @Operation(summary = "Obtener un producto por ID")
     @GetMapping("/{id}")
     public ResponseEntity<Producto> obtenerProductoPorId(@PathVariable Long id) {
         Producto producto = productoServices.obtenerId(id);
@@ -44,6 +49,7 @@ public class ProductoRestControllers {
     }
 
 
+    @Operation(summary = "Listar todos los productos")
     @GetMapping
     public ResponseEntity<List<Producto>> listarProductos() {
         List<Producto> productos = productoServices.obtenerTodos();
@@ -51,6 +57,7 @@ public class ProductoRestControllers {
     }
 
 
+    @Operation(summary = "Eliminar un producto por ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
         productoServices.eliminar(id);
@@ -58,6 +65,7 @@ public class ProductoRestControllers {
     }
 
 
+    @Operation(summary = "Actualizar un producto por ID")
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto productoActualizado) {
         Producto producto = productoServices.actualizar(id, productoActualizado);
@@ -65,7 +73,7 @@ public class ProductoRestControllers {
     }
 
 
-    
+    @Operation(summary = "Desactivar un producto por ID")
     @PatchMapping("/{id}/desactivar")
     public ResponseEntity<Producto> desactivar(@PathVariable Long id) {
         return ResponseEntity.ok(productoServices.desactivar(id));

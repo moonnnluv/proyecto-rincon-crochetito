@@ -41,11 +41,25 @@ public class ProductoServicesImpl implements ProductoServices {
     @Override
     public Producto actualizar(Long id, Producto productoActualizado) {
         Producto existente = obtenerId(id);
-        existente.setNombre(productoActualizado.getNombre());
-        existente.setPrecio(productoActualizado.getPrecio());
-        existente.setDescripcion(productoActualizado.getDescripcion());
+
+        if (productoActualizado.getNombre() != null)
+            existente.setNombre(productoActualizado.getNombre());
+
+        if (productoActualizado.getPrecio() != null)
+            existente.setPrecio(productoActualizado.getPrecio()); 
+
+        if (productoActualizado.getDescripcion() != null)
+            existente.setDescripcion(productoActualizado.getDescripcion());
+
+        if (productoActualizado.getCategoria() != null)
+            existente.setCategoria(productoActualizado.getCategoria());
+
+        if (productoActualizado.getActivo() != null)
+            existente.setActivo(productoActualizado.getActivo());
+
         return productoRepositories.save(existente);
     }
+
 
     @Override
     public Producto desactivar(Long id) {
