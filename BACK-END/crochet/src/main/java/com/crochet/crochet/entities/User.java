@@ -12,8 +12,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,36 +32,41 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;                  // id
+    private Long id; // id
 
-    @Column(length = 100)
-    private String nombre;           // nombre
+    @NotBlank
+    @Size(max = 100)
+    @Column(length = 100, nullable = false)
+    private String nombre; // nombre
 
+    @NotBlank
+    @Email
+    @Size(max = 120)
     @Column(nullable = false, unique = true, length = 120)
-    private String email;            // email
+    private String email; // email
 
-    /** Contraseña ENCRIPTADA (hash). No se devuelve en JSON. */
-    // el hash es una representación encriptada de la contraseña
+    /** Hash BCrypt; no se devuelve en JSON */
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(name = "password_hash", nullable = false, length = 120)
-    private String passwordHash;     // contraseña (encriptada)
+    @NotBlank
+    @Size(min = 8, max = 100)
+    @Column(name = "password", nullable = false, length = 100)
+    private String passwordHash; // contraseña (encriptada)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private Rol rol = Rol.CLIENTE;   // rol: CLIENTE, VENDEDOR, SUPERADMIN
+    private Rol rol = Rol.CLIENTE; // CLIENTE, VENDEDOR, SUPERADMIN
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private EstadoUsuario estado = EstadoUsuario.ACTIVO; // estado: ACTIVO, INACTIVO
+    private EstadoUsuario estado = EstadoUsuario.ACTIVO; // ACTIVO, INACTIVO
 
-    @org.hibernate.annotations.CreationTimestamp
-    @Column(name="creado_en", nullable=false, updatable=false)
+    // La llena la BD con DEFAULT CURRENT_TIMESTAMP
+    @Column(name = "fecha_creacion", insertable = false, updatable = false)
     private LocalDateTime creadoEn;
 
-
     @PrePersist
-    void prePersist() {
-        this.creadoEn = LocalDateTime.now();
+    @PreUpdate
+    void normalize() {
         if (email != null) email = email.trim().toLowerCase();
         if (nombre != null) nombre = nombre.trim();
     }

@@ -1,5 +1,6 @@
 package com.crochet.crochet.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,7 +26,11 @@ public class Producto {
     private String descripcion;
     private Long precio;
     private Boolean activo = true;
+    @Column(name = "destacado", nullable = false)
+    private Boolean destacado = false;
 
+    @Column(name="imagen")
+    private String imagen;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id")
