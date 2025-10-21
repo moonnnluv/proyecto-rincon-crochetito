@@ -13,4 +13,5 @@ public interface UserServices {
   void cambiarPassword(Long id, String rawPassword);
   User cambiarEstado(Long id, EstadoUsuario estado);
   void eliminar(Long id);
+  User login(String email, String rawPassword);
 }

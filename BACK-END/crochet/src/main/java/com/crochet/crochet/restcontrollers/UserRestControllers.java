@@ -56,6 +56,14 @@ public class UserRestControllers {
 
     public record PasswordDTO(@NotBlank @Size(min=8, max=100) String password) {}
 
+    /* === DTOs para LOGIN (inline) === */
+    public record LoginDTO(
+        @NotBlank @Email String email,
+        @NotBlank @Size(min=8, max=100) String password
+    ) {}
+    /** Respuesta segura sin contraseña */
+    public record UserView(Long id, String nombre, String email, String rol, String estado) {}
+
     /* ===== Helpers para parsear enums con 400 en caso inválido ===== */
     private Rol parseRol(String valor){
         if (valor == null) return null;
@@ -79,7 +87,6 @@ public class UserRestControllers {
 
         User creado = service.crear(u, dto.password());
 
-        // Location: /api/usuarios/{id}
         URI location = URI.create("/api/usuarios/" + creado.getId());
         return ResponseEntity.created(location).body(creado);
     }
@@ -115,5 +122,19 @@ public class UserRestControllers {
     public ResponseEntity<Void> eliminar(@PathVariable Long id){
         service.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /* ===== LOGIN real contra BD (bcrypt) ===== */
+    @Operation(summary = "Login de usuario (email + password)")
+    @PostMapping("/login")
+    public UserView login(@Valid @RequestBody LoginDTO dto){
+        User u = service.login(dto.email(), dto.password()); // compara bcrypt y valida estado
+        return new UserView(
+            u.getId(),
+            u.getNombre(),
+            u.getEmail(),
+            u.getRol() != null ? u.getRol().name() : null,
+            u.getEstado() != null ? u.getEstado().name() : null
+        );
     }
 }
