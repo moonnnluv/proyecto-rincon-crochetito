@@ -25,6 +25,8 @@ public class Producto {
     private String nombre;
     private String descripcion;
     private Long precio;
+    @JoinColumn(name="stock")
+    private Integer stock;
     private Boolean activo = true;
     @Column(name = "destacado", nullable = false)
     private Boolean destacado = false;
@@ -35,5 +37,6 @@ public class Producto {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
 
 }
