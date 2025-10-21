@@ -147,3 +147,58 @@ export async function dashboardSafe() {
   };
 }
 
+// src/services/api.js (solo pega/actualiza estas funciones)
+
+async function tryJson(path, opts) {
+  // pequeño wrapper con el mismo fetchJson que ya tienes
+  return fetchJson(path, opts);
+}
+
+// --------- PRODUCTOS ----------
+export async function listProductos({ q = "", categoriaId = "", page = 0, size = 20 } = {}) {
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (categoriaId) params.set("categoriaId", categoriaId);
+  params.set("page", page); params.set("size", size);
+  try {
+    return normalizePage(await tryJson(`/productos?${params.toString()}`));
+  } catch (e) {
+    return normalizePage(await tryJson(`/producto?${params.toString()}`));
+  }
+}
+
+export async function getProducto(id) {
+  try { return await tryJson(`/productos/${id}`); }
+  catch { return await tryJson(`/producto/${id}`); }
+}
+
+export async function createProducto(p) {
+  try { return await tryJson(`/productos`, { method: "POST", body: JSON.stringify(p) }); }
+  catch { return await tryJson(`/producto`,  { method: "POST", body: JSON.stringify(p) }); }
+}
+
+export async function updateProducto(id, p) {
+  try { return await tryJson(`/productos/${id}`, { method: "PUT", body: JSON.stringify(p) }); }
+  catch { return await tryJson(`/producto/${id}`,  { method: "PUT", body: JSON.stringify(p) }); }
+}
+
+export async function deleteProducto(id) {
+  try { return await tryJson(`/productos/${id}`, { method: "DELETE" }); }
+  catch { return await tryJson(`/producto/${id}`,  { method: "DELETE" }); }
+}
+
+export async function setProductoEstado(id, estado) {
+  try { return await tryJson(`/productos/${id}/estado`, { method: "PATCH", body: JSON.stringify({ estado }) }); }
+  catch {
+    // si tu backend no tiene PATCH estado, hacemos PUT completo como fallback
+    const p = await getProducto(id);
+    return updateProducto(id, { ...p, estado });
+  }
+}
+
+export async function uploadProductoImagen(id, file) {
+  const fd = new FormData(); fd.append("file", file);
+  try { return await tryJson(`/productos/${id}/imagen`, { method: "POST", body: fd }); }
+  catch { return await tryJson(`/producto/${id}/imagen`,  { method: "POST", body: fd }); }
+}
+
