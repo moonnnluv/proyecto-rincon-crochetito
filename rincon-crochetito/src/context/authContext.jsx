@@ -1,45 +1,61 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import api from "../services/api";
+import { API } from "../services/api.js";
 
-const AuthCtx = createContext(null);
-const LS_KEY = "rc_user";
-
+// A dónde redirigir según rol
 export function routeForRole(rol) {
-  switch ((rol || "").toUpperCase()) {
-    case "SUPERADMIN":
-    case "ADMIN": return "/admin";
-    case "VENDEDOR": return "/vendedor";
-    default: return "/cuenta";
-  }
+  const r = (rol || "").toUpperCase();
+  if (r === "SUPERADMIN" || r === "ADMIN") return "/admin";
+  if (r === "VENDEDOR" || r === "SELLER") return "/vendedor";
+  return "/mi-cuenta";
 }
 
+// Contexto con valores NO nulos (evita crashes al destructurar)
+const defaultAuth = {
+  user: null,
+  setUser: () => {},
+  login: async () => null,
+  logout: () => {},
+};
+const AuthCtx = createContext(defaultAuth);
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("rc_user")) || null; }
+    catch { return null; }
+  });
 
-  // hidratar desde localStorage
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY); // persiste entre recargas. :contentReference[oaicite:1]{index=1}
-      if (raw) setUser(JSON.parse(raw));
-    } catch {}
-  }, []);
+    if (user) {
+      localStorage.setItem("rc_user", JSON.stringify(user));
+      // ayuda para endpoints que piden adminId en cabecera
+      if (["ADMIN", "SUPERADMIN"].includes((user.rol || "").toUpperCase())) {
+        localStorage.setItem("rc_admin_id", String(user.id || 1));
+      }
+    } else {
+      localStorage.removeItem("rc_user");
+      localStorage.removeItem("rc_admin_id");
+    }
+  }, [user]);
 
-  const login = async (email, password) => {
-    const u = await api.post("/usuarios/login", { email, password }); // usa endpoint real
+  async function login(email, password) {
+    const res = await fetch(`${API}/usuarios/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) throw new Error("Credenciales inválidas");
+    const u = await res.json();
     setUser(u);
-    localStorage.setItem(LS_KEY, JSON.stringify(u));                  // Web Storage API. :contentReference[oaicite:2]{index=2}
-    return u;
-  };
+    return u; // devuelvo usuario para redirigir por rol
+  }
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem(LS_KEY);
-  };
+  function logout() { setUser(null); }
 
-  const hasRole = (...roles) => roles.map(r=>r.toUpperCase()).includes((user?.rol||"").toUpperCase());
-
-  const value = useMemo(() => ({ user, login, logout, hasRole, routeForRole }), [user]);
+  const value = useMemo(() => ({ user, setUser, login, logout }), [user]);
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
 
-export const useAuth = () => useContext(AuthCtx);
+export function useAuth() {
+  // Siempre devuelve objeto (gracias a defaultAuth), nunca null
+  return useContext(AuthCtx);
+}

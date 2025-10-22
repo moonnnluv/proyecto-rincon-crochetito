@@ -1,35 +1,43 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth, routeForRole } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
+import { useAuth, routeForRole } from "../context/authContext.jsx";
 
 export default function Login() {
-  const { login } = useAuth();
   const nav = useNavigate();
-  const loc = useLocation();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
 
-  async function onSubmit(e){
+  async function onSubmit(e) {
     e.preventDefault();
     setErr("");
     try {
       const u = await login(email, password);
-      const to = (loc.state?.from?.pathname) || routeForRole(u.rol);
-      nav(to, { replace: true });
-    } catch (e) {
-      setErr(String(e.message || e));
-      alert("Login inválido");
+      nav(routeForRole(u?.rol), { replace: true });
+    } catch (ex) {
+      setErr(ex.message || "Error de login");
+      alert(ex.message || "Error de login");
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="form">
+    <div className="container" style={{ maxWidth: 480 }}>
       <h2>Iniciar sesión</h2>
-      {err && <div className="err">{err}</div>}
-      <label>Email <input type="email" value={email} onChange={e=>setEmail(e.target.value)} required /></label>
-      <label>Contraseña <input type="password" value={password} onChange={e=>setPassword(e.target.value)} required minLength={8} /></label>
-      <button className="btn primary" type="submit">Entrar</button>
-    </form>
+      {err && <div className="alert alert-danger">{err}</div>}
+      <form onSubmit={onSubmit}>
+        <div className="mb-2">
+          <label className="form-label">Email</label>
+          <input className="form-control" type="email" value={email}
+                 onChange={e=>setEmail(e.target.value)} required />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Contraseña</label>
+          <input className="form-control" type="password" value={password}
+                 onChange={e=>setPassword(e.target.value)} required />
+        </div>
+        <button className="btn btn-primary">Entrar</button>
+      </form>
+    </div>
   );
 }

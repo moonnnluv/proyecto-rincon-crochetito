@@ -2,29 +2,26 @@
    0) Reset & Layout base
    ========================= */
 :root{
-  /* Marca */
   --rc-topbar-bg: #7B3FE4;
   --rc-topbar-fg: #ffffff;
 
-  /* Gutters y hero responsivos */
   --rc-gutter-min: 28px;
   --rc-gutter-max: 140px;
 
-  /* Alto del carrusel (compacto) */
-  --rc-hero-min: 180px;   /* antes: 240px */
-  --rc-hero-ideal: 24vh;  /* antes: 32vh  */
-  --rc-hero-max: 280px;   /* antes: 360px */
+  /* Alto carrusel (base móvil) */
+  --rc-hero-min: 220px;
+  --rc-hero-ideal: 28vh;
+  --rc-hero-max: 320px;
 }
 
 html, body, #root { height: 100%; margin: 0; }
 *, *::before, *::after { box-sizing: border-box; }
 
 .app  { min-height: 100vh; display: flex; flex-direction: column; }
-.main { flex: 1; }                 /* sticky footer */
-h1:first-child { margin-top: 0; }  /* evita hueco arriba */
+.main { flex: 1; }
+h1:first-child { margin-top: 0; }
 img { max-width: 100%; height: auto; display: block; }
 
-/* optional: gutter lateral compartido para topbar/navbar */
 .nav-gutter{
   padding-left:  clamp(var(--rc-gutter-min), 7vw, var(--rc-gutter-max));
   padding-right: clamp(var(--rc-gutter-min), 7vw, var(--rc-gutter-max));
@@ -84,6 +81,20 @@ img { max-width: 100%; height: auto; display: block; }
 #homeCarousel .carousel-control-prev,
 #homeCarousel .carousel-control-next{ width: 7%; }
 
+/* Tablet en adelante: carrusel levemente más alto */
+@media (min-width: 768px){
+  :root{
+    --rc-hero-ideal: 32vh;
+    --rc-hero-max: 360px;
+  }
+}
+@media (min-width: 1200px){
+  :root{
+    --rc-hero-ideal: 34vh;
+    --rc-hero-max: 380px;
+  }
+}
+
 /* =========================
    4) Home – Contenido
    ========================= */
@@ -91,37 +102,6 @@ img { max-width: 100%; height: auto; display: block; }
 @media (min-width: 992px){
   .home-content{ margin-top: 1.5rem; }
 }
-
-/* === Carrusel un poco más alto (suave y responsivo) === */
-:root{
-  /* ...lo demás igual... */
-
-  /* Alto base (mobile primero) */
-  --rc-hero-min: 220px;   /* antes 180px */
-  --rc-hero-ideal: 28vh;  /* antes 24vh  */
-  --rc-hero-max: 320px;   /* antes 280px */
-}
-
-/* Tablet en adelante */
-@media (min-width: 768px){
-  :root{
-    --rc-hero-ideal: 32vh; /* +leve */
-    --rc-hero-max: 360px;
-  }
-}
-
-/* Desktop ancho */
-@media (min-width: 1200px){
-  :root{
-    --rc-hero-ideal: 34vh; /* +poquito */
-    --rc-hero-max: 380px;
-  }
-}
-
-/* (tu CSS de carrusel queda igual) */
-.home-hero #homeCarousel{ --hero-h: clamp(var(--rc-hero-min), var(--rc-hero-ideal), var(--rc-hero-max)); }
-#homeCarousel .carousel-item{ height: var(--hero-h); }
-#homeCarousel .carousel-item img{ width:100%; height:100%; object-fit:cover; object-position:center; }
 
 /* =========================
    Admin UI (aislado con .rc-admin)
@@ -140,11 +120,11 @@ img { max-width: 100%; height: auto; display: block; }
 .rc-admin .table thead th { background:#fafafa; font-weight:600; }
 .rc-admin .actions { display:flex; gap:8px; flex-wrap:wrap; }
 
+ /* 👇 Badge SOLO dentro del admin para no pisar Bootstrap .badge */
 .rc-admin .badge { padding:4px 8px; border-radius:999px; font-size:12px; background:#eee; }
 .rc-admin .badge.ok { background:#e8f8ee; color:#168a4a; }
 .rc-admin .badge.warn { background:#fff1f1; color:#af2330; }
 
-/* Botones del admin (no pisa .btn de Bootstrap gracias al scope) */
 .rc-admin .btn { padding:8px 12px; border:1px solid #ddd; background:#fff; border-radius:8px; cursor:pointer; }
 .rc-admin .btn:hover { background:#f7f7f7; }
 .rc-admin .btn.primary { background:#5a4bdb; color:#fff; border-color:#5a4bdb; }
@@ -172,56 +152,34 @@ img { max-width: 100%; height: auto; display: block; }
 .rc-admin .kpi { font-size:28px; font-weight:700; }
 .rc-admin .kpi-label { color:#666; }
 
-
 /* === Tabla Productos (admin) === */
-.table.products {
+.rc-admin .table.products {
   width: 100%;
-  table-layout: fixed; /* columnas predecibles */
+  table-layout: fixed;
   border-collapse: collapse;
 }
-
-.table.products thead th {
-  text-align: left;
-  font-weight: 600;
-  color: #475569;
-  background: #f8fafc;
+.rc-admin .table.products thead th {
+  text-align: left; font-weight: 600; color: #475569; background: #f8fafc;
 }
-
-.table.products th, .table.products td {
-  padding: 12px 16px;
-  vertical-align: middle;
-  border-bottom: 1px solid #e5e7eb;
+.rc-admin .table.products th, 
+.rc-admin .table.products td {
+  padding: 12px 16px; vertical-align: middle; border-bottom: 1px solid #e5e7eb;
 }
+.rc-admin .table.products .col-idx { width: 48px; }
+.rc-admin .table.products .col-title { width: 44%; }
+.rc-admin .table.products .col-price { width: 12%; }
+.rc-admin .table.products .col-stock { width: 12%; }
+.rc-admin .table.products .col-status { width: 12%; }
+.rc-admin .table.products .col-actions { width: 20%; }
+.rc-admin .table.products .num { text-align: right; display: inline-block; min-width: 72px; }
+.rc-admin .table.products .stock-cell { text-align: center; }
+.rc-admin .table.products .actions { text-align: right; }
 
-/* columnas: ajusta si necesitas */
-.table.products .col-idx { width: 48px; }
-.table.products .col-title { width: 44%; }
-.table.products .col-price { width: 12%; }
-.table.products .col-stock { width: 12%; }
-.table.products .col-status { width: 12%; }
-.table.products .col-actions { width: 20%; }
-
-.table.products .num { text-align: right; display: inline-block; min-width: 72px; }
-.table.products .stock-cell { text-align: center; }
-.table.products .actions { text-align: right; }
-
-/* celda con imagen + texto */
-.prod-cell { display: flex; gap: 12px; align-items: center; }
-.prod-cell .thumb {
+/* celdas con imagen + texto */
+.rc-admin .prod-cell { display: flex; gap: 12px; align-items: center; }
+.rc-admin .prod-cell .thumb {
   width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb;
 }
-.muted { color: #6b7280; }
-.strong { font-weight: 600; }
 
-/* badges (estado / stock) */
-.badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  height: 24px; padding: 0 10px; border-radius: 999px;
-  font-size: 12px; font-weight: 600; line-height: 1;
-}
-.badge.ok   { background: #dcfce7; color: #166534; }   /* verde suave */
-.badge.warn { background: #fee2e2; color: #991b1b; }   /* rojo suave */
-.ml8 { margin-left: 8px; }
-
-/* resaltar fila con stock bajo (<5) sin exagerar */
-.row-low td { background: #fff7ed; } /* ámbar muy claro */
+/* resaltar fila con stock bajo (<5) */
+.rc-admin .row-low td { background: #fff7ed; }

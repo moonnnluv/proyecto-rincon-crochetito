@@ -1,11 +1,18 @@
-// src/context/cartContext.jsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-const CartContext = createContext(null); // si no hay provider, será null
+const defaultCart = {
+  items: [],
+  add: () => {},
+  remove: () => {},
+  clear: () => {},
+  count: 0,
+  total: 0,
+};
+const CartCtx = createContext(defaultCart);
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("rc_cart") || "[]"); }
+    try { return JSON.parse(localStorage.getItem("rc_cart")) || []; }
     catch { return []; }
   });
 
@@ -13,34 +20,25 @@ export function CartProvider({ children }) {
     localStorage.setItem("rc_cart", JSON.stringify(items));
   }, [items]);
 
-  const add = (p, qty = 1) => {
+  function add(prod, qty = 1) {
     setItems(prev => {
-      const i = prev.findIndex(x => x.id === p.id);
+      const i = prev.findIndex(x => x.id === prod.id);
       if (i >= 0) {
-        const copy = [...prev];
-        copy[i] = { ...copy[i], qty: copy[i].qty + qty };
-        return copy;
+        const cp = [...prev];
+        cp[i] = { ...cp[i], qty: (cp[i].qty || 1) + qty };
+        return cp;
       }
-      return [...prev, { ...p, qty }];
+      return [...prev, { ...prod, qty }];
     });
-  };
-  const remove = (id) => setItems(prev => prev.filter(x => x.id !== id));
-  const clear = () => setItems([]);
-
-  const total = useMemo(
-    () => items.reduce((acc, it) => acc + (Number(it.precio||0) * Number(it.qty||0)), 0),
-    [items]
-  );
-
-  const value = useMemo(() => ({ items, add, remove, clear, total }), [items, total]);
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
-}
-
-export function useCart() {
-  const ctx = useContext(CartContext);
-  if (!ctx) {
-    // mensaje claro para detectar si falta el provider
-    throw new Error("useCart debe usarse dentro de <CartProvider>");
   }
-  return ctx;
+  function remove(id) { setItems(prev => prev.filter(x => x.id !== id)); }
+  function clear() { setItems([]); }
+
+  const count = items.reduce((a, it) => a + (it.qty || 1), 0);
+  const total = items.reduce((a, it) => a + (it.qty || 1) * Number(it.precio || 0), 0);
+
+  const value = useMemo(() => ({ items, add, remove, clear, count, total }), [items, count, total]);
+  return <CartCtx.Provider value={value}>{children}</CartCtx.Provider>;
 }
+
+export function useCart() { return useContext(CartCtx); }
