@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createUser, getUser, updateUser } from "../../../services/api.js";
 
-const ROLES = ["ADMIN", "VENDEDOR", "CLIENTE"]; // si tu backend no acepta VENDEDOR, prueba con ADMIN
+const ROLES = ["SUPERADMIN", "ADMIN", "VENDEDOR", "CLIENTE"]; // incluye SUPERADMIN
+
+// Regla fuerte opcional: 8+ con mayúscula, minúscula y número
+const PW_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 export default function UsuarioForm() {
   const { id } = useParams();
@@ -22,11 +25,11 @@ export default function UsuarioForm() {
 
   useEffect(() => {
     if (editing) {
-      getUser(id).then(u => {
+      getUser(id).then((u) => {
         setForm({
           nombre: u?.nombre ?? "",
           email: u?.email ?? "",
-          rol: u?.rol ?? "CLIENTE",
+          rol: (u?.rol ?? "CLIENTE").toUpperCase(),
           password: "",
           estado: u?.estado ?? "ACTIVO",
         });
@@ -36,10 +39,18 @@ export default function UsuarioForm() {
 
   function validate() {
     const e = {};
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email || "");
     if (!form.nombre?.trim()) e.nombre = "Requerido";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email || "")) e.email = "Email inválido";
+    if (!emailOk) e.email = "Email inválido";
     if (!form.rol) e.rol = "Seleccione un rol";
-    if (!editing && (form.password?.length ?? 0) < 6) e.password = "Mínimo 6 caracteres";
+
+    if (!editing) {
+      const pw = (form.password || "").trim();
+      if (pw.length < 8) e.password = "Mínimo 8 caracteres";
+      // si quieres forzar política fuerte, destapa esta línea:
+      if (!PW_REGEX.test(pw)) e.password = "Debe incluir mayúscula, minúscula y número (mín. 8)";
+    }
+
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -61,11 +72,9 @@ export default function UsuarioForm() {
       if (editing) {
         await updateUser(id, basePayload);
       } else {
-        // ⚠️ Compatibilidad: algunos backends usan "contrasena" en vez de "password"
         await createUser({
           ...basePayload,
-          password: form.password,
-          contrasena: form.password,
+          password: form.password, // el backend espera "password"
         });
       }
       nav("/admin/usuarios");
@@ -92,8 +101,10 @@ export default function UsuarioForm() {
         <label>Nombre
           <input
             value={form.nombre}
-            onChange={e=>setForm({...form, nombre:e.target.value})}
+            onChange={(e) => setForm({ ...form, nombre: e.target.value })}
             required
+            autoComplete="name"
+            aria-invalid={!!errors.nombre}
           />
           {errors.nombre && <small className="err">{errors.nombre}</small>}
         </label>
@@ -102,8 +113,10 @@ export default function UsuarioForm() {
           <input
             type="email"
             value={form.email}
-            onChange={e=>setForm({...form, email:e.target.value})}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
             required
+            autoComplete="email"
+            aria-invalid={!!errors.email}
           />
           {errors.email && <small className="err">{errors.email}</small>}
         </label>
@@ -111,10 +124,13 @@ export default function UsuarioForm() {
         <label>Rol
           <select
             value={form.rol}
-            onChange={e=>setForm({...form, rol:e.target.value})}
+            onChange={(e) => setForm({ ...form, rol: e.target.value })}
             required
+            aria-invalid={!!errors.rol}
           >
-            {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+            {ROLES.map((r) => (
+              <option key={r} value={r}>{r}</option>
+            ))}
           </select>
           {errors.rol && <small className="err">{errors.rol}</small>}
         </label>
@@ -124,28 +140,20 @@ export default function UsuarioForm() {
             <input
               type="password"
               value={form.password}
-              onChange={e=>setForm({...form, password:e.target.value})}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
               autoComplete="new-password"
               required
+              minLength={8}                          /* validación nativa */ 
+              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"  /* opcional fuerte */
+              title="Mínimo 8 caracteres con mayúscula, minúscula y número"
+              aria-invalid={!!errors.password}
             />
             {errors.password && <small className="err">{errors.password}</small>}
           </label>
         )}
 
-        {/* Si quieres permitir setear/mostrar estado en edición, descomenta:
-        <label>Estado
-          <select
-            value={form.estado}
-            onChange={e=>setForm({...form, estado:e.target.value})}
-          >
-            <option value="ACTIVO">ACTIVO</option>
-            <option value="INACTIVO">INACTIVO</option>
-          </select>
-        </label>
-        */}
-
         <div className="form-actions">
-          <button className="btn" type="button" onClick={()=>nav(-1)} disabled={submitting}>
+          <button className="btn" type="button" onClick={() => nav(-1)} disabled={submitting}>
             Cancelar
           </button>
           <button className="btn primary" type="submit" disabled={submitting}>

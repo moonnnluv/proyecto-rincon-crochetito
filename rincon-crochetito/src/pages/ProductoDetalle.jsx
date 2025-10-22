@@ -1,78 +1,95 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getProducto } from "../services/productService.js";
+import { useEffect, useState, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getProducto } from "../services/api.js";
 
-const API = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api").replace(/\/$/, "");
-const FALLBACK_IMG = "/img/no_producto.png";
+const IMG_FALLBACK = "/img/no_producto.png";
+const CLP = new Intl.NumberFormat("es-CL"); // MDN Intl.NumberFormat :contentReference[oaicite:0]{index=0}
 
-const normalizeImgUrl = (raw) => {
-  if (!raw) return FALLBACK_IMG;
-  const s = String(raw).trim();
-  if (/^(https?:|blob:)/i.test(s)) return s;     // absolutas/blobs
-  if (s.startsWith("/")) return s;               // absolutas al host
-  if (s.startsWith("img/") || s.startsWith("assets/")) return `/${s}`; // estáticos del front
-  if (s.startsWith("uploads/") || s.startsWith("files/")) return `${API}/${s}`; // backend
-  return `/${s}`; // por defecto, asume estático
-};
-
-const adapt = (x) => ({
-  id: x?.id ?? x?.productoId,
-  nombre: x?.nombre ?? x?.name ?? x?.titulo ?? "Producto",
-  descripcion: x?.descripcion ?? x?.description ?? "",
-  precio: Number(x?.precio ?? x?.price ?? 0),
-  imagen: x?.imagen ?? x?.imagenUrl ?? x?.urlImagen ?? x?.imageUrl ?? x?.image ?? null,
-  stock: x?.stock ?? x?.quantity ?? 0,
-  estado: x?.estado ?? (x?.activo === false ? "INACTIVO" : "ACTIVO"),
-});
+function normalizeImg(path) {
+  if (!path) return IMG_FALLBACK;
+  if (path.startsWith("http") || path.startsWith("data:") || path.startsWith("/")) return path;
+  return "/" + path.replace(/^\.?\//, "");
+}
 
 export default function ProductoDetalle() {
   const { id } = useParams();
+  const nav = useNavigate();
   const [p, setP] = useState(null);
-  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const raw = await getProducto(id);
-        setP(adapt(raw));
-      } catch {
-        setErr("No se pudo cargar el producto.");
-      }
-    })();
+    let alive = true;
+    setLoading(true);
+    getProducto(id)
+      .then((raw) => {
+        if (!alive) return;
+        // normalizador: soporta nombres alternativos
+        const precio = raw?.precio ?? raw?.price ?? 0;
+        const stock = raw?.stock ?? raw?.cantidad ?? 0;
+        const estado = (raw?.estado) ??
+                       (raw?.activo === false ? "INACTIVO" : "ACTIVO");
+        const imagen = normalizeImg(raw?.imagenUrl || raw?.imagen || raw?.imagen_path);
+        setP({
+          id: raw?.id,
+          nombre: raw?.nombre || raw?.titulo || "Producto",
+          descripcion: raw?.descripcion || raw?.detalle || "",
+          precio, stock, estado, imagen
+        });
+      })
+      .finally(() => alive && setLoading(false));
+    return () => (alive = false);
   }, [id]);
 
-  if (err) return <div className="container py-4">{err}</div>;
-  if (!p) return <div className="container py-4">Cargando…</div>;
+  const disponible = useMemo(
+    () => (p?.estado ?? "ACTIVO") === "ACTIVO" && (p?.stock ?? 0) > 0,
+    [p]
+  );
 
-  const fmt = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" });
-  const imgSrc = normalizeImgUrl(p.imagen);
-  const agotado = (p.stock ?? 0) <= 0 || p.estado === "INACTIVO";
+  if (loading) {
+    return <section className="container"><p>Cargando...</p></section>;
+  }
+  if (!p) {
+    return (
+      <section className="container">
+        <p>No se encontró el producto.</p>
+        <button className="btn" onClick={() => nav(-1)}>Volver</button>
+      </section>
+    );
+  }
 
   return (
-    <section className="container py-4 producto-detalle">
+    <section className="container">
       <div className="row g-4">
-        <div className="col-12 col-md-6">
+        <div className="col-12 col-lg-6">
           <img
-            src={imgSrc}
+            src={p.imagen || IMG_FALLBACK}
             alt={p.nombre}
-            className="img-fluid rounded shadow-sm"
-            style={{ width: "100%", height: 360, objectFit: "cover", background: "#f3f4f6" }}
-            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = FALLBACK_IMG; }}
-            loading="lazy"
+            className="img-fluid rounded border"
+            onError={(e) => (e.currentTarget.src = IMG_FALLBACK)}
           />
         </div>
-        <div className="col-12 col-md-6">
-          <h2 className="mb-2">{p.nombre}</h2>
-          <p className="fs-4 fw-bold mb-2">{fmt.format(p.precio)}</p>
+
+        <div className="col-12 col-lg-6">
+          <h3>{p.nombre}</h3>
+          <div className="mb-2">
+            <strong>${CLP.format(p.precio ?? 0)}</strong>
+          </div>
+
+          <div className="d-flex gap-2 align-items-center mb-3">
+            {(p.estado ?? "ACTIVO") === "ACTIVO"
+              ? <span className="badge bg-success">ACTIVO</span>
+              : <span className="badge bg-secondary">INACTIVO</span>}
+            <span className={`badge ${ (p.stock ?? 0) < 5 ? "bg-warning text-dark":"bg-light text-dark"}`}>
+              {p.stock ?? 0} en stock
+            </span>
+          </div>
+
           <p className="text-muted">{p.descripcion}</p>
 
-          {agotado && <span className="badge bg-secondary me-2">Sin stock</span>}
-
           <div className="d-flex gap-2 mt-3">
-            <Link to="/productos" className="btn btn-outline-dark">Volver</Link>
-            <button className="btn btn-dark" disabled={agotado}
-              onClick={() => alert("Añadido (pendiente carrito)")}>
-              {agotado ? "No disponible" : "Añadir al carrito"}
+            <button className="btn btn-outline-dark" onClick={() => nav(-1)}>Volver</button>
+            <button className="btn btn-primary" disabled={!disponible}>
+              {disponible ? "Agregar al carrito" : "No disponible"}
             </button>
           </div>
         </div>

@@ -9,19 +9,17 @@ function authHeaders() {
 }
 
 // fetchJson: respeta FormData (no seteamos Content-Type manual)
-// Nota: el navegador agrega el boundary automáticamente en multipart/form-data. :contentReference[oaicite:1]{index=1}
 async function fetchJson(path, opts = {}) {
   const isForm = opts.body instanceof FormData;
 
   const res = await fetch(`${API}${path}`, {
     method: opts.method || "GET",
-    credentials: "include", // solo si usas cookies/sesiones; requiere CORS con credenciales. :contentReference[oaicite:2]{index=2}
+    credentials: "include",
     headers: {
       ...(isForm ? {} : { "Content-Type": "application/json" }),
       ...authHeaders(),
       ...(opts.headers || {}),
     },
-    // no tocamos el body: si es FormData, va tal cual; si es JSON, mándalo ya stringificado desde el caller
     body: opts.body,
   });
 
@@ -61,7 +59,7 @@ const api = {
 export default api;
 
 /* =========================
-   USUARIOS (named exports)
+   USUARIOS
    ========================= */
 export async function listUsers({ q = "", rol = "", estado = "", page = 0, size = 20 } = {}) {
   const params = new URLSearchParams();
@@ -79,6 +77,8 @@ export const createUser = (u) =>
 export const updateUser = (id, u) =>
   fetchJson(`/usuarios/${id}`, { method: "PUT", body: JSON.stringify(u) });
 export const deleteUser = (id) => fetchJson(`/usuarios/${id}`, { method: "DELETE" });
+
+// ⚠️ Deja SOLO esta versión de setUserEstado
 export async function setUserEstado(id, estado) {
   try {
     return await fetchJson(`/usuarios/${id}/estado`, {
@@ -90,8 +90,9 @@ export async function setUserEstado(id, estado) {
     return updateUser(id, { ...u, estado });
   }
 }
+
 /* =========================
-   PRODUCTOS (named exports)
+   PRODUCTOS
    ========================= */
 export async function listProductos({ q = "", categoriaId = "", page = 0, size = 20 } = {}) {
   const params = new URLSearchParams();
@@ -110,7 +111,6 @@ export const updateProducto = (id, p) =>
   fetchJson(`/productos/${id}`, { method: "PUT", body: JSON.stringify(p) });
 export const deleteProducto = (id) => fetchJson(`/productos/${id}`, { method: "DELETE" });
 
-// setProductoEstado (con fallback a PUT si PATCH no existe)
 export async function setProductoEstado(id, estado) {
   try {
     return await fetchJson(`/productos/${id}/estado`, {
@@ -118,14 +118,13 @@ export async function setProductoEstado(id, estado) {
       body: JSON.stringify({ estado }),
     });
   } catch (e) {
-    // fallback mínimo: PUT completo con el campo estado actualizado
     const p = await getProducto(id);
     return updateProducto(id, { ...p, estado });
   }
 }
 
-// PATCH stock: acepta { stock } o { delta }, con fallback a PUT
-export async function patchProductoStock(id, payload /* {stock} o {delta} */) {
+// PATCH stock: {stock} o {delta}; fallback a PUT
+export async function patchProductoStock(id, payload) {
   try {
     return await fetchJson(`/productos/${id}/stock`, {
       method: "PATCH",
@@ -140,21 +139,17 @@ export async function patchProductoStock(id, payload /* {stock} o {delta} */) {
   }
 }
 
-// Subida de imagen: usar FormData y NO setear Content-Type manualmente.
+// Subida de imagen: FormData + header X-ADMIN-ID si tu back lo exige
 export const uploadProductoImagen = (id, file, adminId) => {
   const fd = new FormData();
   fd.append("file", file);
-
-  // adminId puede venir del login; si no, intenta desde localStorage
   const _adminId = adminId ?? localStorage.getItem("rc_admin_id") ?? "1";
-
   return fetchJson(`/productos/${id}/imagen`, {
     method: "POST",
     headers: { "X-ADMIN-ID": String(_adminId) },
-    body: fd, // 👈 boundary lo agrega el navegador automáticamente
+    body: fd,
   });
 };
-
 
 /* =========================
    DASHBOARD
@@ -183,4 +178,3 @@ export async function dashboardSafe() {
     },
   };
 }
-

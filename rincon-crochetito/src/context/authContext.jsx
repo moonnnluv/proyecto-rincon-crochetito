@@ -1,32 +1,45 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { loginWithBackend } from "../services/authService.js";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import api from "../services/api";
 
 const AuthCtx = createContext(null);
-const LS_KEY = "rc_session";
+const LS_KEY = "rc_user";
+
+export function routeForRole(rol) {
+  switch ((rol || "").toUpperCase()) {
+    case "SUPERADMIN":
+    case "ADMIN": return "/admin";
+    case "VENDEDOR": return "/vendedor";
+    default: return "/cuenta";
+  }
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
+  // hidratar desde localStorage
   useEffect(() => {
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw) setUser(JSON.parse(raw));
+    try {
+      const raw = localStorage.getItem(LS_KEY); // persiste entre recargas. :contentReference[oaicite:1]{index=1}
+      if (raw) setUser(JSON.parse(raw));
+    } catch {}
   }, []);
 
-  // ahora es ASÍNCRONO porque llama al backend
-  async function login({ email, password }) {
-    const res = await loginWithBackend(email, password);
-    if (!res.ok) return { ok: false, msg: res.msg || "Credenciales inválidas" };
-    localStorage.setItem(LS_KEY, JSON.stringify(res.user));
-    setUser(res.user);
-    return { ok: true };
-  }
+  const login = async (email, password) => {
+    const u = await api.post("/usuarios/login", { email, password }); // usa endpoint real
+    setUser(u);
+    localStorage.setItem(LS_KEY, JSON.stringify(u));                  // Web Storage API. :contentReference[oaicite:2]{index=2}
+    return u;
+  };
 
-  function logout() {
-    localStorage.removeItem(LS_KEY);
+  const logout = () => {
     setUser(null);
-  }
+    localStorage.removeItem(LS_KEY);
+  };
 
-  return <AuthCtx.Provider value={{ user, login, logout }}>{children}</AuthCtx.Provider>;
+  const hasRole = (...roles) => roles.map(r=>r.toUpperCase()).includes((user?.rol||"").toUpperCase());
+
+  const value = useMemo(() => ({ user, login, logout, hasRole, routeForRole }), [user]);
+  return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
 
 export const useAuth = () => useContext(AuthCtx);
