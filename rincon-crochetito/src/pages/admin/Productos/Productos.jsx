@@ -6,10 +6,15 @@ const IMG_FALLBACK = "/img/no_producto.png"; // debe existir en public/img
 
 function normalizeImg(path) {
   if (!path) return IMG_FALLBACK;
-  // absoluta o data URL
   if (path.startsWith("http") || path.startsWith("data:") || path.startsWith("/")) return path;
-  // "img/...", "uploads/...", "archivo.jpg" -> a absoluta
   return "/" + path.replace(/^\.?\//, "");
+}
+
+// Ayuda: resuelve si el producto está activo, acepte 'estado' (string) o 'activo' (boolean)
+function isProductoActivo(p) {
+  if (typeof p.activo === "boolean") return p.activo;
+  const est = (p.estado ?? "ACTIVO").toString().toUpperCase();
+  return est === "ACTIVO" || est === "TRUE" || est === "1";
 }
 
 export default function Productos() {
@@ -29,9 +34,21 @@ export default function Productos() {
   }, [q]);
 
   async function onToggle(p) {
-    const nuevo = (p.estado ?? "ACTIVO") === "ACTIVO" ? "INACTIVO" : "ACTIVO";
-    await setProductoEstado(p.id, nuevo);
-    setData(d => ({ ...d, content: d.content.map(x => x.id === p.id ? { ...x, estado: nuevo } : x) }));
+    const activoAhora = isProductoActivo(p);
+    const nuevoEstado = activoAhora ? "INACTIVO" : "ACTIVO"; // usamos PATCH parcial (mejor que PUT para un campo). 
+    try {
+      await setProductoEstado(p.id, nuevoEstado);
+      // refleja en UI ambos modelos (string estado y boolean activo)
+      setData(d => ({
+        ...d,
+        content: d.content.map(x =>
+          x.id === p.id ? { ...x, estado: nuevoEstado, activo: nuevoEstado === "ACTIVO" } : x
+        )
+      }));
+    } catch (e) {
+      console.error(e);
+      alert("No se pudo cambiar el estado del producto.");
+    }
   }
 
   async function onDelete(p) {
@@ -65,39 +82,48 @@ export default function Productos() {
           <tbody>
             {loading && <tr><td colSpan={6}>Cargando...</td></tr>}
             {!loading && rows.length === 0 && <tr><td colSpan={6}>Sin resultados</td></tr>}
-            {rows.map((p, i) => (
-              <tr key={p.id}>
-                <td>{i+1}</td>
-                <td className="prod-cell">
-                  <img
-                    className="thumb"
-                    src={imgOf(p)}
-                    alt={p.nombre}
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                    onError={(e) => { e.currentTarget.src = IMG_FALLBACK; }}
-                  />
-                  <div>
-                    <div className="strong">{p.nombre}</div>
-                    <small className="muted">{(p.descripcion || "").slice(0,90)}</small>
-                  </div>
-                </td>
-                <td>${new Intl.NumberFormat("es-CL").format(p.precio ?? 0)}</td>
-                <td>{p.stock ?? 0}</td>
-                <td>
-                  <span className={`badge ${ (p.estado ?? "ACTIVO")==="ACTIVO" ? "ok":"warn"}`}>
-                    {p.estado ?? "ACTIVO"}
-                  </span>
-                </td>
-                <td className="actions">
-                  <Link className="btn" to={`/admin/productos/${p.id}`}>Editar</Link>
-                  <button className="btn" onClick={()=>onToggle(p)}>
-                    {(p.estado ?? "ACTIVO")==="ACTIVO" ? "Inactivar":"Activar"}
-                  </button>
-                  <button className="btn danger" onClick={()=>onDelete(p)}>Eliminar</button>
-                </td>
-              </tr>
-            ))}
+            {rows.map((p, i) => {
+              const activo = isProductoActivo(p);
+              const estadoLabel = activo ? "ACTIVO" : "INACTIVO";
+              return (
+                <tr key={p.id}>
+                  <td>{i+1}</td>
+                  <td className="prod-cell">
+                    <img
+                      className="thumb"
+                      src={imgOf(p)}
+                      alt={p.nombre}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => { e.currentTarget.src = IMG_FALLBACK; }}
+                    />
+                    <div>
+                      <div className="strong">{p.nombre}</div>
+                      <small className="muted">{(p.descripcion || "").slice(0,90)}</small>
+                    </div>
+                  </td>
+                  <td>${new Intl.NumberFormat("es-CL").format(p.precio ?? 0)}</td>
+                  <td>{p.stock ?? 0}</td>
+                  <td>
+                    <span className={`badge ${ activo ? "ok":"warn"}`}>
+                      {estadoLabel}
+                    </span>
+                  </td>
+                  <td className="actions">
+                    <Link className="btn" to={`/admin/productos/${p.id}`}>Editar</Link>
+                    <button
+                      className="btn"
+                      onClick={()=>onToggle(p)}
+                      aria-label={`${activo ? "Desactivar" : "Activar"} ${p.nombre}`}
+                      title={`${activo ? "Desactivar" : "Activar"} producto`}
+                    >
+                      {activo ? "Desactivar" : "Activar"}
+                    </button>
+                    <button className="btn danger" onClick={()=>onDelete(p)}>Eliminar</button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
