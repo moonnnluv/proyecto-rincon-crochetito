@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import com.crochet.crochet.entities.Producto;
 import com.crochet.crochet.repository.ProductoRepositories;
 
-
 @Service
 public class ProductoServicesImpl implements ProductoServices {
+
     @Autowired
     private ProductoRepositories productoRepositories;
 
@@ -22,13 +22,13 @@ public class ProductoServicesImpl implements ProductoServices {
     @Override
     public Producto obtenerId(Long id) {
         return productoRepositories.findById(id)
-        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
 
     @Override
     public List<Producto> obtenerTodos() {
         return (List<Producto>) productoRepositories.findAll();
-    }   
+    }
 
     @Override
     public void eliminar(Long id) {
@@ -46,7 +46,7 @@ public class ProductoServicesImpl implements ProductoServices {
             existente.setNombre(productoActualizado.getNombre());
 
         if (productoActualizado.getPrecio() != null)
-            existente.setPrecio(productoActualizado.getPrecio()); 
+            existente.setPrecio(productoActualizado.getPrecio());
 
         if (productoActualizado.getDescripcion() != null)
             existente.setDescripcion(productoActualizado.getDescripcion());
@@ -57,9 +57,19 @@ public class ProductoServicesImpl implements ProductoServices {
         if (productoActualizado.getActivo() != null)
             existente.setActivo(productoActualizado.getActivo());
 
+        // NUEVO: soportar actualización de stock e imagen en PUT
+        try {
+            if (productoActualizado.getStock() != null)
+                existente.setStock(Math.max(0, productoActualizado.getStock()));
+        } catch (NoSuchMethodError | NullPointerException ignored) { /* por si el entity cambia */ }
+
+        try {
+            if (productoActualizado.getImagen() != null)
+                existente.setImagen(productoActualizado.getImagen());
+        } catch (NoSuchMethodError | NullPointerException ignored) { /* por si el entity cambia */ }
+
         return productoRepositories.save(existente);
     }
-
 
     @Override
     public Producto desactivar(Long id) {
@@ -67,5 +77,4 @@ public class ProductoServicesImpl implements ProductoServices {
         producto.setActivo(false);
         return productoRepositories.save(producto);
     }
-
 }

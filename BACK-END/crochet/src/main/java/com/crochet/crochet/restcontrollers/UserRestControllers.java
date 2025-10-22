@@ -31,40 +31,29 @@ public class UserRestControllers {
     private final UserServices service;
     public UserRestControllers(UserServices service){ this.service = service; }
 
-    @Operation(summary = "Listar todos los usuarios")
-    @GetMapping
-    public List<User> listar(){ return service.listar(); }
-
-    @Operation(summary = "Obtener un usuario por ID")
-    @GetMapping("/{id}")
-    public User obtener(@PathVariable Long id){ return service.obtener(id); }
-
-    /* ===== DTOs con validaciones ===== */
+    /* ====== DTOs ====== */
     public record CreateUserDTO(
         @NotBlank @Size(max=100) String nombre,
         @NotBlank @Email @Size(max=120) String email,
         @NotBlank @Size(min=8, max=100) String password,
         String rol // opcional
     ) {}
-
     public record UpdateUserDTO(
         @Size(max=100) String nombre,
         @Email @Size(max=120) String email,
         String rol,     // opcional
         String estado   // opcional
     ) {}
-
     public record PasswordDTO(@NotBlank @Size(min=8, max=100) String password) {}
 
-    /* === DTOs para LOGIN (inline) === */
-    public record LoginDTO(
-        @NotBlank @Email String email,
-        @NotBlank @Size(min=8, max=100) String password
-    ) {}
-    /** Respuesta segura sin contraseña */
+    // Para PATCH estado por JSON
+    public record EstadoDTO(String estado) {}
+
+    public record LoginDTO(@NotBlank @Email String email,
+                           @NotBlank @Size(min=8, max=100) String password) {}
     public record UserView(Long id, String nombre, String email, String rol, String estado) {}
 
-    /* ===== Helpers para parsear enums con 400 en caso inválido ===== */
+    /* ===== Helpers ===== */
     private Rol parseRol(String valor){
         if (valor == null) return null;
         try { return Rol.valueOf(valor.trim().toUpperCase()); }
@@ -75,6 +64,16 @@ public class UserRestControllers {
         try { return EstadoUsuario.valueOf(valor.trim().toUpperCase()); }
         catch (IllegalArgumentException ex) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estado inválido"); }
     }
+
+    /* ===== Endpoints ===== */
+
+    @Operation(summary = "Listar todos los usuarios")
+    @GetMapping
+    public List<User> listar(){ return service.listar(); }
+
+    @Operation(summary = "Obtener un usuario por ID")
+    @GetMapping("/{id}")
+    public User obtener(@PathVariable Long id){ return service.obtener(id); }
 
     @Operation(summary = "Crear un nuevo usuario")
     @PostMapping
@@ -111,10 +110,25 @@ public class UserRestControllers {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Cambiar el estado de un usuario")
+    @Operation(summary = "Cambiar el estado de un usuario (JSON {estado} ó ?estado=; sin valor -> toggle)")
     @PatchMapping("/{id}/estado")
-    public User cambiarEstado(@PathVariable Long id, @RequestParam String estado){
-        return service.cambiarEstado(id, parseEstado(estado));
+    public User cambiarEstado(
+        @PathVariable Long id,
+        @RequestParam(value = "estado", required = false) String estadoQP,
+        @RequestBody(required = false) EstadoDTO body
+    ){
+        EstadoUsuario nuevo = null;
+
+        if (body != null && body.estado() != null && !body.estado().isBlank()) {
+            nuevo = parseEstado(body.estado());
+        } else if (estadoQP != null && !estadoQP.isBlank()) {
+            nuevo = parseEstado(estadoQP);
+        } else {
+            User u = service.obtener(id);
+            EstadoUsuario actual = u.getEstado() != null ? u.getEstado() : EstadoUsuario.ACTIVO;
+            nuevo = (actual == EstadoUsuario.ACTIVO) ? EstadoUsuario.INACTIVO : EstadoUsuario.ACTIVO;
+        }
+        return service.cambiarEstado(id, nuevo);
     }
 
     @Operation(summary = "Eliminar un usuario por ID")
@@ -128,7 +142,7 @@ public class UserRestControllers {
     @Operation(summary = "Login de usuario (email + password)")
     @PostMapping("/login")
     public UserView login(@Valid @RequestBody LoginDTO dto){
-        User u = service.login(dto.email(), dto.password()); // compara bcrypt y valida estado
+        User u = service.login(dto.email(), dto.password());
         return new UserView(
             u.getId(),
             u.getNombre(),

@@ -22,7 +22,7 @@ public class AuthService {
   public User login(String email, String rawPassword) {
     String mail = email.trim().toLowerCase();
 
-    User u = userRepository.findByEmailIgnoreCase(mail)
+    User u = userRepository.findByEmail(mail)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario/contraseña inválidos"));
 
     if (u.getEstado() != null && u.getEstado() != EstadoUsuario.ACTIVO) {

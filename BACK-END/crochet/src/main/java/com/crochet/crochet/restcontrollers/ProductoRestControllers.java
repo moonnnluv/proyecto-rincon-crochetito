@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.crochet.crochet.entities.Producto;
 import com.crochet.crochet.entities.Rol;
 import com.crochet.crochet.repository.UserRepository;
-import com.crochet.crochet.repository.ProductoRepositories; 
+import com.crochet.crochet.repository.ProductoRepositories;
 import com.crochet.crochet.services.ProductoServices;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +45,7 @@ public class ProductoRestControllers {
         var u = userRepository.findById(adminId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin no existe"));
         if (u.getRol() != Rol.SUPERADMIN) {
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No autorizado");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No autorizado");
         }
     }
 
@@ -74,17 +74,81 @@ public class ProductoRestControllers {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Actualizar un producto por ID")
+    @Operation(summary = "Actualizar un producto por ID (reemplazo total)")
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizarProducto(
         @PathVariable Long id, @RequestBody Producto productoActualizado) {
         return ResponseEntity.ok(productoServices.actualizar(id, productoActualizado));
     }
 
-    @Operation(summary = "Desactivar un producto por ID")
+    @Operation(summary = "Desactivar un producto por ID (legacy)")
     @PatchMapping("/{id}/desactivar")
     public ResponseEntity<Producto> desactivar(@PathVariable Long id) {
         return ResponseEntity.ok(productoServices.desactivar(id));
+    }
+
+    // ====== NUEVO: Cambiar estado ACTIVO/INACTIVO con PATCH ======
+    @Operation(summary = "Cambiar estado (ACTIVO/INACTIVO) de un producto")
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<Producto> cambiarEstado(
+        @PathVariable Long id,
+        @RequestBody(required = false) Map<String, Object> body
+    ) {
+        var p = productoRepositories.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no existe"));
+
+        boolean nuevoActivo;
+        if (body == null || !body.containsKey("estado") || body.get("estado") == null) {
+            // si no viene nada, alterna (toggle)
+            nuevoActivo = !(Boolean.TRUE.equals(p.getActivo()));
+        } else {
+            Object v = body.get("estado");
+            if (v instanceof Boolean b) {
+                nuevoActivo = b;
+            } else {
+                String s = v.toString().trim();
+                if ("ACTIVO".equalsIgnoreCase(s) || "TRUE".equalsIgnoreCase(s) || "1".equals(s)) nuevoActivo = true;
+                else if ("INACTIVO".equalsIgnoreCase(s) || "FALSE".equalsIgnoreCase(s) || "0".equals(s)) nuevoActivo = false;
+                else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "estado inválido");
+            }
+        }
+
+        p.setActivo(nuevoActivo);
+        productoRepositories.save(p);
+        return ResponseEntity.ok(p);
+    }
+
+    // ====== NUEVO: Actualizar stock con PATCH ======
+    public static class StockDTO {
+        private Integer stock; // absoluto
+        private Integer delta; // incremento/decremento
+
+        public Integer getStock() { return stock; }
+        public void setStock(Integer stock) { this.stock = stock; }
+        public Integer getDelta() { return delta; }
+        public void setDelta(Integer delta) { this.delta = delta; }
+    }
+
+    @Operation(summary = "Actualizar stock (absoluto o delta) de un producto")
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<Producto> actualizarStock(
+        @PathVariable Long id,
+        @RequestBody StockDTO dto
+    ) {
+        var p = productoRepositories.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no existe"));
+
+        int actual = p.getStock() == null ? 0 : p.getStock();
+        if (dto.getStock() != null) {
+            actual = Math.max(0, dto.getStock());
+        }
+        if (dto.getDelta() != null) {
+            actual = Math.max(0, actual + dto.getDelta());
+        }
+        p.setStock(actual);
+
+        productoRepositories.save(p);
+        return ResponseEntity.ok(p);
     }
 
     // ---------- SUBIDA DE IMAGEN ----------
