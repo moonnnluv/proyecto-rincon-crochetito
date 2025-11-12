@@ -15,4 +15,13 @@ export default defineConfig({
       },
     },
   },
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/tests/setupTests.js'],
+    globals: true,
+    coverage: {
+      reporter: ['text','html'],
+      reportsDirectory: './coverage'
+    },
+  },
 })

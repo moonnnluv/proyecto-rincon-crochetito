@@ -7,8 +7,8 @@ export default function Header({ cartCount = 0 }) {
   const role = (user?.rol || "").toUpperCase();
   const navCls = ({ isActive }) => "nav-link" + (isActive ? " active" : "");
   const panelPath = role === "VENDEDOR" ? "/vendedor"
-                   : (role === "ADMIN" || role === "SUPERADMIN") ? "/admin"
-                   : "/mi-cuenta";
+                  : (role === "ADMIN" || role === "SUPERADMIN") ? "/admin"
+                  : "/mi-cuenta";
   const handleLogout = () => { logout(); nav("/"); };
 
   return (
