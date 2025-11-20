@@ -33,6 +33,7 @@ import UsuarioForm from "./pages/admin/Usuarios/UsuarioForm.jsx";
 import AdminDashboard from "./pages/admin/Dashboard.jsx";
 import AdminProductos from "./pages/admin/Productos/Productos.jsx";
 import AdminProductoForm from "./pages/admin/Productos/ProductoForm.jsx";
+import Boleta from "./pages/Boleta.jsx";
 
 /* ===== Helpers inline ===== */
 
@@ -202,6 +203,8 @@ export default function App() {
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
+
+          <Route path="/boleta" element={<Boleta />} />
         </Routes>
       </main>
 
