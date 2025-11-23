@@ -33,6 +33,10 @@ public class Boleta {
 
     private LocalDateTime fecha;
 
+    // 🔹 Id del usuario dueño de la boleta (coincide con columna id_usuario en la BD)
+    @Column(name = "id_usuario")
+    private Long idUsuario;
+
     // Datos básicos del cliente
     @Column(length = 120)
     private String clienteNombre;

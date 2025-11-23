@@ -1,7 +1,6 @@
 package com.crochet.crochet.services;
 
 import java.util.List;
-
 import com.crochet.crochet.entities.Boleta;
 
 public interface BoletaService {
@@ -11,4 +10,7 @@ public interface BoletaService {
     Boleta obtenerPorId(Long id);
 
     List<Boleta> obtenerTodas();
+
+    // 🔥 nuevo:
+    List<Boleta> obtenerPorClienteEmail(String email);
 }
