@@ -14,12 +14,6 @@ export default function Carrito() {
   // toast de stock
   const [notif, setNotif] = useState(null);
 
-  // modal compra
-  const [showGuestModal, setShowGuestModal] = useState(false);
-  const [guestEmail, setGuestEmail] = useState("");
-  const [purchaseError, setPurchaseError] = useState("");
-  const [loadingCompra, setLoadingCompra] = useState(false);
-
   // autocierre de toast
   useEffect(() => {
     if (!notif) return;
@@ -64,65 +58,6 @@ export default function Carrito() {
     }
 
     updateQty(it.id, nueva);
-  };
-
-  // muestra el modal de compra (siempre pedimos elegir sesión / invitado)
-  const handleComprarClick = () => {
-    setPurchaseError("");
-    setShowGuestModal(true);
-  };
-
-  // llamada real al backend para generar la boleta
-  const crearBoleta = async (correoInvitado) => {
-    try {
-      setLoadingCompra(true);
-      setPurchaseError("");
-
-      const token = localStorage.getItem("token"); // si tienes JWT
-      const resp = await fetch("http://localhost:8080/api/boletas", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          // 🔴 AJUSTA ESTO A TU DTO DE BOLETA
-          email: correoInvitado || null, // o "correoCliente"
-          items: items.map((it) => ({
-            productoId: it.id,           // idProducto
-            cantidad: it.qty,            // qty
-            precioUnitario: it.precio,   // opcional si tu back lo calcula
-          })),
-          total, // si tu back lo calcula, puedes omitirlo
-        }),
-      });
-
-      if (!resp.ok) {
-        throw new Error("No se pudo procesar la compra.");
-      }
-
-      const boleta = await resp.json();
-
-      clear(); // vaciamos carrito
-      setShowGuestModal(false);
-      setGuestEmail("");
-
-      // vamos a la página de boleta
-      navigate("/boleta", { state: { boleta } });
-    } catch (err) {
-      console.error(err);
-      setPurchaseError(err.message || "Error al procesar la compra.");
-    } finally {
-      setLoadingCompra(false);
-    }
-  };
-
-  const handleConfirmarInvitado = async () => {
-    if (!guestEmail || !guestEmail.includes("@")) {
-      setPurchaseError("Ingresa un correo electrónico válido para continuar.");
-      return;
-    }
-    await crearBoleta(guestEmail);
   };
 
   return (
@@ -174,10 +109,9 @@ export default function Carrito() {
         </button>
         <button
           className="btn btn-dark"
-          onClick={handleComprarClick}
-          disabled={loadingCompra}
+          onClick={() => navigate("/checkout")}
         >
-          {loadingCompra ? "Procesando..." : "Comprar"}
+          Comprar
         </button>
       </div>
 
@@ -213,67 +147,6 @@ export default function Carrito() {
                   onClick={() => setNotif(null)}
                 >
                   Entendido
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL COMPRA: login o invitado */}
-      {showGuestModal && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1090 }}
-        >
-          <div className="card shadow" style={{ width: "100%", maxWidth: 420 }}>
-            <div className="card-body">
-              <button
-                className="btn-close float-end"
-                onClick={() => setShowGuestModal(false)}
-              ></button>
-
-              <h5 className="card-title mb-2">Completar compra</h5>
-              <p className="text-muted" style={{ fontSize: "0.9rem" }}>
-                Puedes iniciar sesión o comprar como invitado ingresando tu
-                correo electrónico para asociar la boleta.
-              </p>
-
-              <div className="mb-3">
-                <label className="form-label">Correo electrónico</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder="tucorreo@ejemplo.cl"
-                  value={guestEmail}
-                  onChange={(e) => setGuestEmail(e.target.value)}
-                />
-              </div>
-
-              {purchaseError && (
-                <div className="text-danger small mb-2">
-                  {purchaseError}
-                </div>
-              )}
-
-              <div className="d-flex justify-content-between gap-2 mt-2">
-                <button
-                  className="btn btn-outline-secondary"
-                  onClick={() => {
-                    setShowGuestModal(false);
-                    navigate("/login");
-                  }}
-                >
-                  Iniciar sesión
-                </button>
-                <button
-                  className="btn btn-primary"
-                  onClick={handleConfirmarInvitado}
-                  disabled={loadingCompra}
-                >
-                  {loadingCompra
-                    ? "Procesando..."
-                    : "Comprar como invitado"}
                 </button>
               </div>
             </div>

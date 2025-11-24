@@ -32,6 +32,9 @@ export default function Header({ cartCount = 0 }) {
               <li className="nav-item"><NavLink className={navCls} to="/nosotros">Nosotros</NavLink></li>
               <li className="nav-item"><NavLink className={navCls} to="/blogs">Blogs</NavLink></li>
               <li className="nav-item"><NavLink className={navCls} to="/contacto">Contacto</NavLink></li>
+
+              {/* 🔥 NUEVO: enlace directo a /mis-compras */}
+              <li className="nav-item"><NavLink className={navCls} to="/mis-compras">Mis compras</NavLink></li>
             </ul>
           </div>
 
@@ -51,8 +54,10 @@ export default function Header({ cartCount = 0 }) {
                   <span className="position-relative d-inline-block px-2 py-1">
                     <i className="bi bi-cart3 fs-5"></i>
                     {cartCount > 0 && (
-                      <span className="position-absolute translate-middle badge rounded-pill bg-danger"
-                        style={{ top: "-4px", left: "18px", minWidth: 18, height: 18, lineHeight: "18px", fontSize: ".7rem", padding: 0 }}>
+                      <span
+                        className="position-absolute translate-middle badge rounded-pill bg-danger"
+                        style={{ top: "-4px", left: "18px", minWidth: 18, height: 18, lineHeight: "18px", fontSize: ".7rem", padding: 0 }}
+                      >
                         {cartCount}
                       </span>
                     )}
@@ -74,13 +79,19 @@ export default function Header({ cartCount = 0 }) {
                     <i className="bi bi-person-circle"></i> <span>{user.email}</span>
                   </button>
                   <ul className="dropdown-menu dropdown-menu-end">
-                    <li><Link className="dropdown-item" to={panelPath}>
-                      {role === "VENDEDOR" ? "Panel Vendedor"
-                      : (role === "ADMIN" || role === "SUPERADMIN") ? "Panel Admin" : "Mi cuenta"}
-                    </Link></li>
+                    <li>
+                      <Link className="dropdown-item" to={panelPath}>
+                        {role === "VENDEDOR" ? "Panel Vendedor"
+                        : (role === "ADMIN" || role === "SUPERADMIN") ? "Panel Admin" : "Mi cuenta"}
+                      </Link>
+                    </li>
                     <li><Link className="dropdown-item" to="/pedidos">Mis pedidos</Link></li>
                     <li><hr className="dropdown-divider" /></li>
-                    <li><button className="dropdown-item" type="button" onClick={handleLogout}>Cerrar sesión</button></li>
+                    <li>
+                      <button className="dropdown-item" type="button" onClick={handleLogout}>
+                        Cerrar sesión
+                      </button>
+                    </li>
                   </ul>
                 </li>
               )}
