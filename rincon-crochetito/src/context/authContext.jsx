@@ -1,5 +1,23 @@
+// src/context/authContext.jsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { API } from "../services/api.js";
+
+// Helper: decodificar payload del JWT para ver "exp"
+function parseJwt(token) {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
 
 // A dónde redirigir según rol
 export function routeForRole(rol) {
@@ -28,12 +46,32 @@ export function AuthProvider({ children }) {
     }
   });
 
+  // 🕒 Al montar: si el token está vencido, limpiamos sesión
+  useEffect(() => {
+    const token = localStorage.getItem("rc_token");
+    if (!token) return;
+
+    const payload = parseJwt(token);
+    if (payload?.exp) {
+      const nowSeconds = Date.now() / 1000;
+      if (payload.exp < nowSeconds) {
+        // Token expirado → limpiamos todo
+        setUser(null);
+        localStorage.removeItem("rc_token");
+        localStorage.removeItem("rc_user");
+        localStorage.removeItem("rc_admin_id");
+      }
+    }
+  }, []);
+
   // Sincroniza usuario en localStorage + admin_id
   useEffect(() => {
     if (user) {
       localStorage.setItem("rc_user", JSON.stringify(user));
       if (["ADMIN", "SUPERADMIN"].includes((user.rol || "").toUpperCase())) {
         localStorage.setItem("rc_admin_id", String(user.id || 1));
+      } else {
+        localStorage.removeItem("rc_admin_id");
       }
     } else {
       localStorage.removeItem("rc_user");
@@ -72,6 +110,7 @@ export function AuthProvider({ children }) {
   function logout() {
     setUser(null);
     localStorage.removeItem("rc_token");
+    // rc_user y rc_admin_id se limpian en el useEffect de arriba
   }
 
   const value = useMemo(() => ({ user, setUser, login, logout }), [user]);

@@ -28,6 +28,19 @@ async function fetchJson(path, opts = {}) {
     ? await res.json().catch(() => ({}))
     : await res.text().catch(() => "");
 
+  // 🔐 Manejo centralizado de sesión inválida / token vencido
+  if (res.status === 401 || res.status === 403) {
+    // Limpiamos todo el estado de auth en localStorage
+    localStorage.removeItem("rc_token");
+    localStorage.removeItem("rc_user");
+    localStorage.removeItem("rc_admin_id");
+
+    // Si no estamos ya en /login, redirigimos
+    if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+      window.location.href = "/login";
+    }
+  }
+
   if (!res.ok) {
     const msg = typeof data === "string" && data ? data : JSON.stringify(data);
     throw new Error(`${res.status} ${res.statusText}${msg ? ` — ${msg}` : ""}`);
