@@ -37,7 +37,11 @@ public class BoletaServiceImpl implements BoletaService {
 
     @Override
     public List<Boleta> obtenerPorClienteEmail(String email) {
-        // 🔥🔥🔥 HACK RESCATE ENTREGA — DEVUELVE TODAS LAS BOLETAS
-        return (List<Boleta>) boletaRepository.findAll();
+        if (email == null || email.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email requerido");
+        }
+
+        String mail = email.trim().toLowerCase();
+        return boletaRepository.findByClienteEmailOrderByFechaDesc(mail);
     }
 }
