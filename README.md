@@ -107,10 +107,8 @@ http://localhost:8080
 
 ### Swagger / OpenAPI
 
-Si está habilitado springdoc-openapi:
 
 - `http://localhost:8080/swagger-ui/index.html`
-- `http://localhost:8080/v3/api-docs`
 
 ---
 
