@@ -36,12 +36,13 @@ Este README explica cómo instalar, configurar y ejecutar ambos componentes, ade
 
 ## 📁 Estructura del proyecto
 
-
 ```txt
-proyecto-rincon-crochetito/
-  backend/        # API REST Spring Boot
-  frontend/       # SPA React + Vite
-  README.md       # este archivo
+BACK-END/                # API REST Spring Boot (EA3) - proyecto en BACK-END/crochet
+FRONT-END/               # Frontend React + Vite (EA3)
+EA1-EA2/FRONT-END-HTML/  # Frontend antiguo en HTML (EA1–EA2)
+documentacion/           # ERS, testing, PDFs
+README.md
+
 ```
 
 ---
