@@ -24,10 +24,7 @@ public class BoletaServiceImpl implements BoletaService {
     @Override
     public Boleta obtenerPorId(Long id) {
         return boletaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Boleta no encontrada"
-                ));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Boleta no encontrada"));
     }
 
     @Override
@@ -40,7 +37,6 @@ public class BoletaServiceImpl implements BoletaService {
         if (email == null || email.trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email requerido");
         }
-
         String mail = email.trim().toLowerCase();
         return boletaRepository.findByClienteEmailOrderByFechaDesc(mail);
     }
