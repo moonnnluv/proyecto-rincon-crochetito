@@ -1,4 +1,3 @@
-// src/pages/MisCompras.jsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -23,7 +22,7 @@ export default function MisCompras() {
       setLoading(true);
 
       const res = await fetch(
-        `/api/boletas/por-email?email=${encodeURIComponent(trimmed)}`
+        `http://localhost:8080/api/boletas/por-email?email=${encodeURIComponent(trimmed)}`
       );
       if (!res.ok) throw new Error("Error al cargar las boletas");
 
@@ -39,7 +38,7 @@ export default function MisCompras() {
     }
   };
 
-  // Filtro real por correo (por si vienen más boletas)
+  // Filtro extra de seguridad en frontend
   const boletasFiltradas = boletas.filter(
     (b) => (b.clienteEmail || "").toLowerCase() === searchedEmail
   );
