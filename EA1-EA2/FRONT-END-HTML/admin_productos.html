@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Admin Productos | Rincón Crochetito</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="img/logo.ico">
+
+    <!-- Bootstrap CSS/JS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap Icons (para bi-*) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="css/global.css">
+    </head>
+    <body class="bg-light">
+    <!-- Guardia: solo ADMIN -->
+    <script src="js/auth-guard.js"></script>
+    <script>requireAuth('ADMIN');</script>
+
+    <!-- Topbar -->
+    <div class="alert alert-marca text-center rounded-0 mb-0 py-2">
+        ¿Encargos abiertos?
+        <a href="https://www.instagram.com/rincon.crochetito" target="_blank">
+        ¡Sí! Escríbeme para tu pedido personalizado ✨
+        </a>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top shadow-sm">
+        <div class="container align-items-center">
+        <!-- Marca -->
+        <a class="navbar-brand d-flex align-items-center gap-2" href="home.html">
+            <img src="img/logo.ico" alt="Rincón Crochetito" width="28" height="28" class="rounded">
+            <span>Rincón Crochetito</span>
+        </a>
+
+        <!-- Toggler -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Menú -->
+        <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+            <!-- Links al centro -->
+            <ul class="navbar-nav gap-2 navbar-center">
+            <li class="nav-item"><a class="nav-link" href="home.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="productos.html">Productos</a></li>
+            <li class="nav-item"><a class="nav-link" href="nosotros.html">Nosotros</a></li>
+            <li class="nav-item"><a class="nav-link" href="blog.html">Blogs</a></li>
+            <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
+            </ul>
+
+            <!-- Acciones a la derecha -->
+            <ul class="navbar-nav align-items-center gap-2 ms-auto">
+            <!-- Carrito (opcional en admin) -->
+            <li class="nav-item">
+                <a class="nav-link p-0" href="carrito.html" aria-label="Carrito">
+                <span class="position-relative d-inline-block px-2 py-1">
+                    <i class="bi bi-cart3 fs-5"></i>
+                    <span id="cartCount"
+                        class="position-absolute translate-middle badge rounded-pill bg-danger d-none"
+                        style="top:-4px; left:18px; min-width:18px; height:18px; line-height:18px; font-size:.7rem; padding:0;">
+                    0
+                    </span>
+                </span>
+                </a>
+            </li>
+
+            <!-- Ingresar (si no hay sesión) -->
+            <li class="nav-item d-block" id="navIngresarItem">
+                <a class="btn btn-primary btn-sm" href="iniciar_sesion.html">Ingresar</a>
+            </li>
+
+            <!-- Usuario (si hay sesión) -->
+            <li class="nav-item dropdown d-none" id="navUserItem">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle"></i> <span id="navUserEmail">Usuario</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="mi-cuenta.html">Mi cuenta</a></li>
+                <li><a class="dropdown-item" href="pedidos.html">Mis pedidos</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><button class="dropdown-item" id="btnLogout" type="button">Cerrar sesión</button></li>
+                </ul>
+            </li>
+            </ul>
+        </div>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO: Gestión de productos -->
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 m-0">Gestión de Productos</h1>
+        <a class="btn btn-outline-secondary btn-sm" href="home_admin.html">Volver al panel</a>
+        </div>
+
+        <!-- Alertas -->
+        <div id="alertBox" class="alert d-none" role="alert"></div>
+
+        <!-- Formulario -->
+        <div class="card mb-4">
+        <div class="card-body">
+            <form id="formProducto" novalidate>
+            <input type="hidden" id="id">
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                <input id="nombre" class="form-control" required maxlength="60">
+                <div class="invalid-feedback">Ingresa un nombre (máx 60).</div>
+                </div>
+
+                <div class="col-md-4">
+                <label class="form-label">Precio (CLP)</label>
+                <input id="precio" type="number" min="0" step="1" class="form-control" required>
+                <div class="invalid-feedback">Ingresa un precio válido.</div>
+                </div>
+
+                <div class="col-md-4">
+                <label class="form-label">Imagen (ruta)</label>
+                <input id="imagen" class="form-control" placeholder="img/no_producto.png">
+                <div class="form-text">Usa una imagen de /img o deja el placeholder.</div>
+                </div>
+
+                <div class="col-12">
+                <label class="form-label">Descripción</label>
+                <textarea id="descripcion" class="form-control" rows="2" required maxlength="200"></textarea>
+                <div class="invalid-feedback">Ingresa una descripción (máx 200).</div>
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <button class="btn btn-outline-secondary" type="button" id="btnNuevo">Nuevo</button>
+            </div>
+            </form>
+        </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+            <table class="table table-sm align-middle" id="tabla">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Imagen</th>
+                    <th>Descripción</th>
+                    <th style="width:110px;">Acciones</th>
+                </tr>
+                </thead>
+                <tbody><tr><td colspan="6" class="text-muted">Cargando…</td></tr></tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+    </body>
+    </html>

@@ -1,8 +1,0 @@
-{ "productos": [
-    { "id":1,"slug":"llavero-honguito","nombre":"Porta Encendedor/Labial Honguito","descripcion":"Funda a crochet en forma de hongo para encendedor o labial, con asa para colgar.","precio":4500,"imagen":"img/no_producto.png","pagina":"producto_1.html","destacado": true},
-    { "id":2,"slug":"cintillo-malla","nombre":"Cintillo Malla","descripcion":"Cintillo tejido en punto malla, cómodo y estiloso.","precio":6000,"imagen":"img/no_producto.png","pagina":"producto_2.html","destacado": true},
-    { "id":3,"slug":"posavasos-rosas","nombre":"Posavasos Rosas","descripcion":"Set de posavasos tejidos en tonos rosados, 4 unidades.","precio":7000,"imagen":"img/no_producto.png","pagina":"producto_3.html","destacado": true},
-    { "id":4,"slug":"macetero-rosas","nombre":"Macetero Rosas","descripcion":"Cubre-macetero tejido en tonos rosados para decorar tu hogar.","precio":8000,"imagen":"img/no_producto.png","pagina":"producto_4.html"},
-    { "id":5,"slug":"mitones","nombre":"Mitones","descripcion":"Mitones tejidos a crochet, abrigados y cómodos.","precio":9000,"imagen":"img/no_producto.png","pagina":"producto_5.html"},
-    { "id":6,"slug":"gorro","nombre":"Gorro","descripcion":"Gorro tejido a crochet para adulto, ideal para invierno.","precio":10000,"imagen":"img/no_producto.png","pagina":"producto_6.html"}
-]}
